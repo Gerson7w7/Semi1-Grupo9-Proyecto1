@@ -95,3 +95,14 @@ body {
 .bd-mode-toggle {
   z-index: 1500;
 }
+.logo {
+  border-radius: 7rem;
+  margin-left: 4rem;
+  margin-top: 3rem;
+}
+.mainlogin {
+  background-image: url('https://wallpapercave.com/wp/wp5934405.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
