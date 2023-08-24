@@ -4,13 +4,15 @@ import {
   Routes,
   Route
 } from "react-router-dom";
-// import Dashboard from "./components/Dashboard";
+import PaginaPrincipal from "./pages/PaginaPrincipal";
+import Login from "./pages/Login";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* <Route path='/' element={<Dashboard />} /> */}
+        <Route path='/' element={<PaginaPrincipal />} />
+        <Route path='/login' element={<Login />} />
       </Routes>
     </Router>
   );
