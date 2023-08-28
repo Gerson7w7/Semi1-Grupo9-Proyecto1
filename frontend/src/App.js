@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import PaginaPrincipal from "./pages/PaginaPrincipal";
 import Login from "./pages/Login";
+import Buscar from "./pages/Buscar";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path='/' element={<Navigate to="/login" />} />
         <Route path='/login' element={<Login />} />
         <Route path='/inicio' element={<PaginaPrincipal />} />
+        <Route path='/buscar' element={<Buscar />} />
       </Routes>
     </Router>
   );

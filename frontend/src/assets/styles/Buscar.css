@@ -1,0 +1,24 @@
+/* styles.css */
+.narrow-search {
+  max-width: 400px; /* Ajusta este valor según tu preferencia */
+  margin: 0 auto; /* Centrar el buscador horizontalmente */
+}
+
+.narrow-search input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.narrow-search button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.favorite-button {
+  background-size: contain; /* Ajusta el tamaño de la imagen para que quepa en el botón */
+  border: none; /* Remueve el borde del botón */
+  width: 50px; /* Ajusta el ancho de acuerdo al tamaño de la imagen */
+  height: 45px; /* Ajusta la altura de acuerdo al tamaño de la imagen */
+  padding: 0; /* Remueve cualquier espacio interior del botón */
+  border-radius: 100px;
+}

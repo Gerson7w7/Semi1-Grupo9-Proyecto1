@@ -19,7 +19,8 @@ const Login = () => {
     if (email === "admin@admin.com") {
       if (password === "123") {
         console.log("ADMIN");
-        navigate("/administracion");
+        navigate("/inicio");
+        localStorage.setItem("isAdmin", 1);
       } else {
         console.log("ERROR");
         setShowError(true);
@@ -48,6 +49,7 @@ const Login = () => {
 
       if (inicioExitoso) {
         navigate("/inicio");
+        localStorage.setItem("isAdmin", 0);
       } else {
         console.log("ERROR");
         setShowError(true);
