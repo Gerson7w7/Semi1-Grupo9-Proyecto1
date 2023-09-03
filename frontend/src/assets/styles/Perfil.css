@@ -1,5 +1,5 @@
-/* Centra todos los elementos en la página */
-.container {
+
+.contenedor {
     position: absolute;
     top: 200px; /* Ubicación vertical en píxeles desde la parte superior */
     left: 850px; /* Ubicación horizontal en píxeles desde la izquierda */
@@ -12,6 +12,12 @@
   /* Estilo para la foto de perfil circular */
   .profile-picture {
     width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .profile-photo {
+    width: 390x;
     height: 200px;
     border-radius: 50%;
     object-fit: cover;
@@ -46,13 +52,13 @@
     transform: scale(0.95);
   }
   
-  .form-container {
+  .form-contenedor {
     display: flex;
     align-items: center;
     justify-content: flex-start;
   }
   
-  .profile-picture-container {
+  .profile-picture-contenedor {
     margin-right: 20px; /* Espacio entre la imagen de perfil y el formulario */
   }
   

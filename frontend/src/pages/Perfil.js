@@ -52,7 +52,7 @@ function Perfil() {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       // Aquí puedes procesar el archivo seleccionado (por ejemplo, cargarlo y mostrarlo como imagen de perfil).
-      // En este ejemplo, solo actualizamos la URL de la imagen de perfil.
+
       const fileReader = new FileReader();
       fileReader.onload = () => {
         setFotoPerfil(fileReader.result);
@@ -69,11 +69,11 @@ function Perfil() {
   return (
     <main>
         <Navegacion/>
-    <div className="container">
+    <div className="contenedor">
       <h1>Perfil de Usuario</h1>
       {modoEdicion ? (
-        <div className="form-container">
-        <div className="profile-picture-container">
+        <div className="form-contenedor">
+        <div className="profile-picture-contenedor">
           <img className="profile-picture bigger" src={fotoPerfil} alt="Foto de Perfil" />
           <button className="add-button" onClick={handleAgregarImagenClick}>+</button>
           <input
@@ -126,7 +126,7 @@ function Perfil() {
         </div>
       ) : (
         <div>
-          <div className="profile-picture-container">
+          <div className="profile-photo">
             <img className="profile-picture bigger" src={fotoPerfil} alt="Foto de Perfil" />
           </div>
           <div className="user-info">

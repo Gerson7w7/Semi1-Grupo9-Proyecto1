@@ -12,12 +12,14 @@ import Historico from "./pages/Historico";
 import Artista from "./pages/Artista";
 import Cancion from "./pages/Cancion";
 import Perfil from "./pages/Perfil";
+import RegistroUsuario from "./pages/Registro";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path='/' element={<Navigate to="/login" />} />
+        <Route path='/registro' element={<RegistroUsuario />} />
         <Route path='/login' element={<Login />} />
         <Route path='/inicio' element={<PaginaPrincipal />} />
         <Route path='/buscar' element={<Buscar />} />

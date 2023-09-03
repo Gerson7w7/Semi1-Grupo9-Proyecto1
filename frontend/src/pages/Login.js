@@ -78,7 +78,7 @@ const Login = () => {
             width="200"
             height="200"
           />
-          <h1 class="h3 mb-3 fw-normal">Unicio de Sesión</h1>
+          <h1 class="h3 mb-3 fw-normal">Inicio de Sesión</h1>
 
           <div class="form-floating">
             <input
@@ -116,7 +116,10 @@ const Login = () => {
           <button class="btn btn-primary w-100 py-2" type="submit">
             Iniciar sesión
           </button>
-          <br />
+          <p className="mt-3 mb-3 text-center">
+            ¿No tienes cuenta?{" "}
+            <a href="http://localhost:3000/registro">Regístrate</a>
+          </p>
           <br />
           <br />
           <br />
