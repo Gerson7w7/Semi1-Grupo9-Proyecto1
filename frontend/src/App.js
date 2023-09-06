@@ -13,7 +13,8 @@ import Artista from "./pages/Artista";
 import Cancion from "./pages/Cancion";
 import Perfil from "./pages/Perfil";
 import RegistroUsuario from "./pages/Registro";
-
+import Playlist from "./pages/Playlist";
+import InPlaylist from "./pages/InPlaylist"
 function App() {
   return (
     <Router>
@@ -27,6 +28,8 @@ function App() {
         <Route path='/artista' element={<Artista />} />
         <Route path='/cancion' element={<Cancion />} />
         <Route path='/perfil' element={<Perfil />} />
+        <Route path='/playlist' element={<Playlist/>} />
+        <Route path='/inplaylist' element={<InPlaylist/>} />  
       </Routes>
     </Router>
   );
