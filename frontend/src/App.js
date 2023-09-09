@@ -17,6 +17,7 @@ import Playlist from "./pages/Playlist";
 import InPlaylist from "./pages/InPlaylist";
 import AudioPlayer from "./components/Reproductor";
 import Admin from "./pages/Admin";
+import Favoritos from "./pages/Favoritos";
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/playlist" element={<Playlist />} />
           <Route path="/inplaylist" element={<InPlaylist />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/favoritos" element={<Favoritos />} />
         </Routes>
         <AudioPlayer />
       </Router>
