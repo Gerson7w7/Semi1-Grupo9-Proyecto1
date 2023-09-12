@@ -1,113 +1,81 @@
-var AWS = require('aws-sdk')
+var AWS = require('aws-sdk');
+const bucket = 'semi1-ht-p1-202004707';
 
-var guardarImagen = async (req, res) => {
-    var id = req.body.id;
-    var img = req.body.img;
+AWS.config.update({
+    region: process.env.REGION,
+    accessKeyId: process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
+});
 
-    var nombre = `Fotos/${id}/.jpg`;
+function guardarImagen(id, img64) {
+    var nombre = `Fotos/${id}.jpg`;
     //Conversión de base64 a bytes
-    let buff = new Buffer.from(img, 'base64');
-
-    AWS.config.update({
-        region: 'us-east-2',
-        accessKeyId: '',
-        secretAccessKey: ''
-    });
+    let buff = new Buffer.from(img64, 'base64');
 
     var s3 = new AWS.S3()
-
     const params = {
-        Bucket: 'semi1proyecto1',
-        Key: nombre, // Nombre de ubicacion
+        Bucket: bucket,
+        Key: nombre, // Nombre de archivo
         Body: buff,
         ContentType: 'image',
     }
-    
-    const putResult = s3.putObject(params).promise();
-    res.json({ mensaje: putResult, status: true })
+    s3.putObject(params).promise();
 }
 
-var guardarCancion = async (req, res) => {
-    var id = req.body.id;
-    var cancion = req.body.cancion;
-
-    var nombre = `Canciones/${id}/.mp3`;
+function guardarCancion(id, mp3_64) {
+    var nombre = `Canciones/${id}.jpg`;
     //Conversión de base64 a bytes
-    let buff = new Buffer.from(cancion, 'base64');
-
-    AWS.config.update({
-        region: 'us-east-2',
-        accessKeyId: '',
-        secretAccessKey: ''
-    });
+    let buff = new Buffer.from(mp3_64, 'base64');
 
     var s3 = new AWS.S3()
-
     const params = {
-        Bucket: 'semi1proyecto1',
-        Key: nombre, // Nombre de ubicacion
+        Bucket: bucket,
+        Key: nombre, // Nombre de archivo
         Body: buff,
         ContentType: 'song',
     }
-    
-    const putResult = s3.putObject(params).promise();
-    res.json({ mensaje: putResult, status: true })
+    s3.putObject(params).promise();
 }
 
-var getImagen = async (req, res) => {
-    var id = req.body.id;
+function getImagen(id) {
     var nombre = `Fotos/${id}.jpg`;
 
-    AWS.config.update({
-        region: 'us-east-2',
-        accessKeyId: '',
-        secretAccessKey: '',
-    })
+    var S3 = new AWS.S3()
+    var getParams = {
+        Bucket: bucket,
+        Key: nombre,
+    }
+    return new Promise((resolve, reject) => {
+        S3.getObject(getParams, function (err, data) {
+            if (err) {
+                reject(err);
+            } else {
+                var dataBase64 = Buffer.from(data.Body).toString('base64'); //resgresar de byte a base 64
+                resolve({ image: dataBase64 });
+            }
+        });
+    });
+}
+
+function getCancion(id) {
+    var nombre = `Canciones/${id}.mp3`;
 
     var S3 = new AWS.S3()
-
     var getParams = {
-        Bucket: 'semi1proyecto1',
+        Bucket: bucket,
         Key: nombre,
     }
-
-    S3.getObject(getParams, function (err, data) {
-        if (err) {
-            res.json(err);
-        } else {
-            var dataBase64 = Buffer.from(data.Body).toString('base64'); //resgresar de byte a base 64
-            res.json({ mensaje: dataBase64 });
-        }
+    return new Promise((resolve, reject) => {
+        S3.getObject(getParams, function (err, data) {
+            if (err) {
+                reject(err);
+            } else {
+                var dataBase64 = Buffer.from(data.Body).toString('base64'); //resgresar de byte a base 64
+                resolve({ song: dataBase64 });
+            }
+        });
     });
 }
-
-var getCancion = async (req, res) => {
-    var id = req.body.id;
-    var nombre = `Canciones/${id}.jpg`;
-
-    AWS.config.update({
-        region: 'us-east-2',
-        accessKeyId: '',
-        secretAccessKey: '',
-    })
-
-    var S3 = new AWS.S3();
-
-    var getParams = {
-        Bucket: 'semi1proyecto1',
-        Key: nombre,
-    }
-
-    S3.getObject(getParams, function (err, data) {
-        if (err) {
-            res.json(err)
-        } else {
-            var dataBase64 = Buffer.from(data.Body).toString('base64'); //resgresar de byte a base 64
-            res.json({ mensaje: dataBase64 });
-        }
-    });
-}
-
 
 module.exports = {
     guardarImagen,

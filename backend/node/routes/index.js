@@ -1,8 +1,8 @@
-var sha256 = require('js-sha256')
-var router = require('express').Router()
-const conn = require('../database/db.js');
+const sha256 = require('js-sha256');
+const router = require('express').Router();
 
-const { loginUsuario, registrarUsuario } = require('../controller/mysql')
+const { loginUsuario, registrarUsuario, existeUsuario } = require('../controller/mysql')
+const { guardarImagen } = require('../controller/s3');
 
 
 router.get('/', (req, res) => {
@@ -38,13 +38,16 @@ router.post('/registro', async (req, res) => {
     if (nombres === "" || apellidos === "" || correo === "" || imagen === "") {
         res.status(400).json({"ok": false});
     } else {
-        //Pendiente guardar imagen en S3 y obtener link
-        link_imagen = ''
-
         try {
-            const result = await registrarUsuario(nombres, apellidos, link_imagen, correo, pass, fecha);
-            if (result.status) {
-                res.status(200).json({ok: true})
+            const result1 = await existeUsuario(correo);
+            if (!result1.status) {
+                guardarImagen('usuarios/' + correo, imagen);
+                const result = await registrarUsuario(nombres, apellidos, correo, pass, fecha);
+                if (result.status) {
+                    res.status(200).json({ok: true})
+                } else {
+                    res.status(400).json({ok: false})
+                }
             } else {
                 res.status(400).json({ok: false})
             }

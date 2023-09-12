@@ -1,7 +1,6 @@
 CREATE TABLE Artistas (
     id_artista       INT PRIMARY KEY AUTO_INCREMENT,
-    nombre           VARCHAR(35) NOT NULL,
-    foto             VARCHAR(300) NOT NULL,
+    nombre           VARCHAR(35) NOT NULL
     fecha_nacimiento DATE
 );
 
@@ -30,7 +29,6 @@ CREATE TABLE Usuarios (
     id_usuario       INT PRIMARY KEY AUTO_INCREMENT,
     nombres          VARCHAR(35) NOT NULL,
     apellidos        VARCHAR(35) NOT NULL,
-    foto             VARCHAR(300) NOT NULL,
     correo           VARCHAR(50) NOT NULL,
     password         VARCHAR(100) NOT NULL,
     fecha_nacimiento DATE NOT NULL
