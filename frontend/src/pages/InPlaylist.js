@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Buscar.css";
 import { useLocation } from "react-router-dom";
@@ -9,7 +9,7 @@ const InPlaylist = () => {
   const nombrePlaylist = params.get("nombrePlaylist");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [songToDelete, setSongToDelete] = useState(null); // Almacena el ID de la canción a eliminar
-  const [songs, setSongs] = useState([
+  /*const [songs, setSongs] = useState([
     {
       id: 1,
       title: "Givenchy",
@@ -29,11 +29,33 @@ const InPlaylist = () => {
       duration: "3 mins",
     },
     // Agrega más canciones aquí
-  ]);
+  ]);*/
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchForm, setShowSearchForm] = useState(false); // Controla si se muestra el formulario de búsqueda
+  const [songs, setSongs] = useState([]); // Inicialmente, el arreglo de canciones está vacío
+  const ip = "localhost";
+
+  useEffect(() => {
+    const url = `http://${ip}:5000/playlist`;
+    // Realizar una solicitud GET al servidor para obtener las canciones de la playlist
+    
+    const searchParams = new URLSearchParams(location.search);
+    const nombrePlaylistParam = searchParams.get("nombrePlaylist");
+    const decodedNombrePlaylist = decodeURIComponent(nombrePlaylistParam);
+    const encode = encodeURI(decodedNombrePlaylist)
+    console.log( url+`/${encode}`)
+    fetch(url+`/${encode}`)
+      .then((response) => response.json())
+      .then((data) => {
+        // Actualizar el estado con los datos de las canciones obtenidas
+        setSongs(data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener las canciones:", error);
+      });
+  }, [nombrePlaylist]);
 
   const handleSearchInputChange = (e) => {
     const query = e.target.value;
@@ -49,14 +71,40 @@ const InPlaylist = () => {
   const handleAddToPlaylist = (songId) => {
     // Encuentra la canción seleccionada por su ID
     const selectedSong = songs.find((song) => song.id === songId);
-
-    // Agrega la canción a la playlist
-    setSongs([...songs, selectedSong]);
-
-    // Limpia el campo de búsqueda y los resultados
-    setSearchQuery("");
-    setSearchResults([]);
+  
+    // Realizar una solicitud POST al backend para agregar la canción
+    const url = `http://${ip}:5000/playlist/add-song`; // URL del endpoint del servidor para agregar canciones
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(selectedSong), // Envía los datos de la canción como datos JSON
+    };
+  
+    fetch(url, requestOptions)
+      .then((response) => {
+        if (response.ok) {
+          // La canción se agregó con éxito en el servidor
+          // Actualiza el estado en el frontend para reflejar la adición
+          setSongs(response);
+  
+          // Limpia el campo de búsqueda y los resultados
+          setSearchQuery("");
+          setSearchResults([]);
+  
+          // Puedes realizar alguna acción adicional si es necesario
+          console.log('Canción agregada con éxito.');
+        } else {
+          // Manejar el error si la solicitud no fue exitosa
+          console.error('Error al agregar la canción.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error en la solicitud:', error);
+      });
   };
+  
 
   const handleDeleteClick = (songId) => {
     setSongToDelete(songId); // Guarda el ID de la canción a eliminar
@@ -70,13 +118,35 @@ const InPlaylist = () => {
 
   const handleConfirmDelete = () => {
     if (songToDelete !== null) {
-      // Elimina la canción de la tabla
-      const updatedSongs = songs.filter((song) => song.id !== songToDelete);
-      setSongs(updatedSongs);
-      setShowConfirmation(false);
-      setSongToDelete(null); // Restablece el valor de songToDelete
+      // Realizar la solicitud POST al backend para eliminar la canción
+      const url = `http://${ip}:5000/playlist/delete-song`; // URL del endpoint del servidor para eliminar canciones
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ songId: songToDelete }), // Envía el ID de la canción a eliminar como datos JSON
+      };
+  
+      fetch(url, requestOptions)
+        .then((response) => {
+          if (response.ok) {
+            // La canción se eliminó con éxito en el servidor
+            // Actualiza el estado en el frontend para reflejar la eliminación
+            setSongToDelete(response)
+            setShowConfirmation(false);
+            setSongToDelete(null);
+          } else {
+            // Manejar el error si la solicitud no fue exitosa
+            console.error('Error al eliminar la canción.');
+          }
+        })
+        .catch((error) => {
+          console.error('Error en la solicitud:', error);
+        });
     }
   };
+  
 
   return (
     <main>
