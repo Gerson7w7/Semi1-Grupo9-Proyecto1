@@ -1,14 +1,37 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Buscar.css";
 import { Link } from "react-router-dom";
 
 const Playlist = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [playlists, setPlaylists] = useState([]);
+  const [playlists, setPlaylists] = useState([
+    {
+      nombre: "Mi Playlist 15",
+      descripcion: "Descripción de mi playlist",
+      imagen: "URL_de_la_imagen",
+    },
+    
+  ]);
   const [nombrePlaylist, setNombrePlaylist] = useState("");
   const [descripcionPlaylist, setDescripcionPlaylist] = useState("");
   const [imagenPlaylist, setImagenPlaylist] = useState(null);
+  const [imagenBase64, setImagenBase64] = useState(""); // Almacenará la imagen en formato base64
+  const ip = "localhost";
+  
+  useEffect(() => {
+    // Hacer una solicitud GET a la API para obtener las playlists
+    const url = `http://${ip}:5000/playlist`;
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        // Actualizar el estado de las playlists con los datos recibidos
+        setPlaylists(data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener las playlists:", error);
+      });
+  }, []);
 
   const toggleFormulario = () => {
     setMostrarFormulario(!mostrarFormulario);
@@ -21,21 +44,43 @@ const Playlist = () => {
       return;
     }
 
+    // Validar que se haya seleccionado una imagen
+    if (!imagenBase64) {
+      alert("Por favor seleccione una imagen para la playlist.");
+      return;
+    }
+
     // Crear un objeto de playlist con los datos ingresados
     const nuevaPlaylist = {
       nombre: nombrePlaylist,
       descripcion: descripcionPlaylist,
-      imagen: URL.createObjectURL(imagenPlaylist), // Utiliza la imagen seleccionada
+      imagenBase64: imagenBase64,
     };
 
-    // Agregar la nueva playlist a la lista de playlists
-    setPlaylists([...playlists, nuevaPlaylist]);
+    // Enviar los datos al servidor mediante una solicitud POST
+    const url = `http://${ip}:5000/playlist`;
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(nuevaPlaylist),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Actualizar el estado de las playlists con la nueva playlist creada
+        setPlaylists(data);
 
-    // Cerrar el formulario y limpiar los campos
-    setMostrarFormulario(false);
-    setNombrePlaylist("");
-    setDescripcionPlaylist("");
-    setImagenPlaylist(null);
+        // Cerrar el formulario y limpiar los campos
+        setMostrarFormulario(false);
+        setNombrePlaylist("");
+        setDescripcionPlaylist("");
+        setImagenPlaylist(null);
+        setImagenBase64("");
+      })
+      .catch((error) => {
+        console.error("Error al crear la playlist:", error);
+      });
   };
 
   const handleCancelar = () => {
@@ -47,8 +92,15 @@ const Playlist = () => {
   };
 
   const handleImagenChange = (e) => {
-    // Actualizar el estado de la imagen cuando el usuario selecciona un archivo
     const imagenSeleccionada = e.target.files[0];
+
+    // Leer la imagen seleccionada y convertirla a base64
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImagenBase64(event.target.result);
+    };
+
+    reader.readAsDataURL(imagenSeleccionada);
     setImagenPlaylist(imagenSeleccionada);
   };
 

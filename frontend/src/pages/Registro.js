@@ -21,6 +21,41 @@ function RegistroUsuario() {
       alert("Error! Las contraseñas no coinciden.");
       return;
     }
+    if (password !== confirmPassword) {
+      setShowError(true);
+      alert("Error! Las contraseñas no coinciden.");
+      return;
+    }
+  
+    // Crear un objeto con los datos del usuario
+    const usuario = {
+      nombres,
+      apellidos,
+      imagen: foto, // Aquí podrías enviar la imagen en base64, si estás seguro de que no es demasiado grande
+      correo: email,
+      password,
+    };
+  
+    // Realizar la solicitud POST al servidor
+    fetch("http://localhost:5000/registro", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(usuario),
+    })
+      .then((response) => {
+        if (response.ok) {
+          // La solicitud fue exitosa, puedes redirigir al usuario a la página de inicio
+          window.location.href = "http://localhost:3000/inicio";
+        } else {
+          // La solicitud falló, maneja el error como desees (mostrar mensaje de error, etc.)
+          console.error("Error al registrar usuario");
+        }
+      })
+      .catch((error) => {
+        console.error("Error al registrar usuario:", error);
+      });
     window.location.href = "http://localhost:3000/inicio";
     setShowError(false);
   };
