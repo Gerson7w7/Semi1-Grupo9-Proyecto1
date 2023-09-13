@@ -16,9 +16,7 @@ CREATE TABLE Albumes (
 CREATE TABLE Canciones (
     id_cancion INT PRIMARY KEY AUTO_INCREMENT,
     nombre     VARCHAR(35) NOT NULL,
-    imagen     VARCHAR(300) NOT NULL,
     duracion   FLOAT NOT NULL,
-    mp3        VARCHAR(300) NOT NULL,
     id_artista INT NOT NULL,
     id_album   INT,
     FOREIGN KEY (id_artista) REFERENCES Artistas(id_artista),
