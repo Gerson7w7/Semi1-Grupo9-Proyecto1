@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Buscar.css";
-import { useLocation } from "react-router-dom";
+import AudioPlayer from "../components/Reproductor";
 
 const Favoritos = () => {
   const [isFavorite, setIsFavorite] = useState(false);

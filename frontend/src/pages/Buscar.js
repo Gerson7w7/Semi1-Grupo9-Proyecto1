@@ -2,6 +2,7 @@ import React from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Buscar.css";
 import { useState } from "react";
+import AudioPlayer from "../components/Reproductor";
 
 const Buscar = () => {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -474,6 +475,7 @@ const Buscar = () => {
           </div>
         </div>
       </div>
+        <AudioPlayer />
     </main>
   );
 };

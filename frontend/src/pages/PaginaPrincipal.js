@@ -1,6 +1,7 @@
 import React from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/PaginaPrincipal.css";
+import AudioPlayer from "../components/Reproductor";
 // import { useEffect, useState } from "react";
 
 const PaginaPrincipal = () => {
@@ -270,6 +271,7 @@ const PaginaPrincipal = () => {
           </div>
         </div>
       </div>
+      <AudioPlayer />
     </main>
   );
 };

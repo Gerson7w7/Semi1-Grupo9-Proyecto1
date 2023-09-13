@@ -15,9 +15,9 @@ import Perfil from "./pages/Perfil";
 import RegistroUsuario from "./pages/Registro";
 import Playlist from "./pages/Playlist";
 import InPlaylist from "./pages/InPlaylist";
-import AudioPlayer from "./components/Reproductor";
 import Admin from "./pages/Admin";
 import Favoritos from "./pages/Favoritos";
+import Radio from "./pages/Radio";
 
 function App() {
 
@@ -37,8 +37,8 @@ function App() {
           <Route path="/inplaylist" element={<InPlaylist />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/favoritos" element={<Favoritos />} />
+          <Route path="/radio" element={<Radio />} />
         </Routes>
-        <AudioPlayer />
       </Router>
   );
 }

@@ -102,8 +102,6 @@ body {
 }
 .mainlogin {
   background-image: url('https://wallpapercave.com/wp/wp5934405.jpg');
-  position: relative;
-  z-index: 2000;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;

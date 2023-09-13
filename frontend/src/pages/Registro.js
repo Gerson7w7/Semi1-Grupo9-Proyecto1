@@ -85,7 +85,7 @@ function RegistroUsuario() {
   };
 
   return (
-    <div className="registroUsuario">
+    <div className="mainlogin">
       {showError && mostrarError()}
       <main className="form-signin w-100 m-auto">
         <div className="profile-picture-container">

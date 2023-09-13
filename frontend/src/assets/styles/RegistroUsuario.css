@@ -24,24 +24,7 @@
   height: 40px;
   cursor: pointer;
   position: absolute;
-  bottom: 620px; /* Ajusta la posición según tus preferencias */
+  bottom: 420px; /* Ajusta la posición según tus preferencias */
   right: 800px; /* Ajusta la posición según tus preferencias */
 }
 
-.container-form {
-  position: absolute;
-  top: 350px; /* Ubicación vertical en píxeles desde la parte superior */
-  left: 765px; /* Ubicación horizontal en píxeles desde la izquierda */
-  width: 400px; /* Ancho del elemento en píxeles */
-  height: 200px; /* Altura del elemento en píxeles */
-  text-align: center;
-}
-
-
-.profile-picture-container {
-  top: 100px; /* Ubicación vertical en píxeles desde la parte superior */
-  left: 870px; /* Ubicación horizontal en píxeles desde la izquierda */
-  width: 320px; /* Ancho del elemento en píxeles */
-  height: 200px; /* Altura del elemento en píxeles */
-  text-align: center;
-}

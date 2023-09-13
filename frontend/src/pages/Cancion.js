@@ -1,6 +1,7 @@
 import React from "react";
 import Navegacion from "../components/Navegacion";
 import { useState, useEffect } from "react";
+import AudioPlayer from "../components/Reproductor";
 
 const Cancion = () => {
   const [nombre, setNombre] = useState("");
@@ -695,6 +696,7 @@ const Cancion = () => {
           </div>
         </div>
       </div>
+      <AudioPlayer />
     </main>
   );
 };

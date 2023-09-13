@@ -1,6 +1,7 @@
 import React from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Historico.css";
+import AudioPlayer from "../components/Reproductor";
 // import { useEffect, useState } from "react";
 
 const Historico = () => {
@@ -218,6 +219,7 @@ const Historico = () => {
           </div>
         </div>
       </div>
+        <AudioPlayer />
     </main>
   );
 };

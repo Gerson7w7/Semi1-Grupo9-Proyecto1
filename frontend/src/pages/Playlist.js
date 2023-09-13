@@ -2,6 +2,7 @@ import React, { useState , useEffect} from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Buscar.css";
 import { Link } from "react-router-dom";
+import AudioPlayer from "../components/Reproductor";
 
 const Playlist = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -107,7 +108,7 @@ const Playlist = () => {
   return (
     <main>
       <Navegacion />
-      <div className="container">
+      <div className="container contenido album py-5">
         <h1 className="title">Tu Libreria</h1>
         <button className="btn btn-primary" onClick={toggleFormulario}>
           Crear Playlist
@@ -222,6 +223,7 @@ const Playlist = () => {
           </div>
         </div>
       </div>
+        <AudioPlayer />
     </main>
   );
 };

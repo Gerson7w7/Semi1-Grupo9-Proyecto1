@@ -1,6 +1,7 @@
 import React from "react";
 import Navegacion from "../components/Navegacion";
 import { useState, useEffect } from "react";
+import AudioPlayer from "../components/Reproductor";
 
 const Artista = () => {
   const [nombre, setNombre] = useState("");
@@ -11,20 +12,20 @@ const Artista = () => {
   const [showError, setShowError] = useState(false);
   const ip = "localhost";
 
-//   useEffect(() => {
-//       const url = `http://${ip}:5000/get-artistas`;
-  
-//       const fetchData = async () => {
-//         fetch(url)
-//           .then((res) => res.json())
-//           .catch((error) => console.error("Error:", error))
-//           .then((res) => {
-//             console.log("res: ", res);
-//             setArtistas(res.artistas);
-//           });
-//       };
-//       fetchData();
-//     }, [artistas]);
+  //   useEffect(() => {
+  //       const url = `http://${ip}:5000/get-artistas`;
+
+  //       const fetchData = async () => {
+  //         fetch(url)
+  //           .then((res) => res.json())
+  //           .catch((error) => console.error("Error:", error))
+  //           .then((res) => {
+  //             console.log("res: ", res);
+  //             setArtistas(res.artistas);
+  //           });
+  //       };
+  //       fetchData();
+  //     }, [artistas]);
 
   const crearArtista = () => {
     const reader = new FileReader();
@@ -536,7 +537,11 @@ const Artista = () => {
                               autocomplete="off"
                             />
                             <br />
-                            <button type="button" class="btn btn-warning" onClick={() => eliminarArtista("1")}>
+                            <button
+                              type="button"
+                              class="btn btn-warning"
+                              onClick={() => eliminarArtista("1")}
+                            >
                               Confirmar
                             </button>
                           </div>
@@ -552,6 +557,7 @@ const Artista = () => {
           </div>
         </div>
       </div>
+      <AudioPlayer />
     </main>
   );
 };

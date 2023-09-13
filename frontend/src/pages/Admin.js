@@ -2,6 +2,7 @@ import React from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Admin.css";
 import { useNavigate } from "react-router-dom";
+import AudioPlayer from "../components/Reproductor";
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -48,6 +49,7 @@ const Admin = () => {
           </div>
         </div>
       </div>
+      <AudioPlayer />
     </main>
   );
 };
