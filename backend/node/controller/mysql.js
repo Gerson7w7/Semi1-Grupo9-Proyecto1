@@ -291,7 +291,38 @@ function deleteCancion(id) {
     });
 }
 
+//========================================== CRUD ALBUMES ==========================================
+function readAlbumes() {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT alb.id_album, alb.nombre, alb.descripcion, a.nombre AS artista FROM Albumes alb
+                    INNER JOIN Artistas a ON a.id_artista = alb.id_artista`, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let albumes = [];
+                for (let album of result) {
+                    const imagen64 = await getImagen('albumes/' + album.id_album);
+                    albumes.push({
+                        id: album.id_cancion,
+                        imagen: imagen64.image,
+                        nombre: album.nombre,
+                        artista: album.artista
+                    })
+                }
+                resolve({ 'albums': albumes });
+            }
+        }));
+    });
+}
 
+//=========================================== FAVORITOS ============================================
+function favorito(id_usuario, id_cancion) {
+    return new Promise((resolve, reject) => {
+        conn.query('SELECT * FROM Favoritos WHERE id_usuario = ? AND id_cancion = ?', [id_usuario, id_cancion], (async (err, result) => {
+
+        }));
+    });
+}
 
 module.exports = {
     loginUsuario,
@@ -309,5 +340,7 @@ module.exports = {
     createCancion,
     readCanciones,
     updateCancion,
-    deleteCancion
+    deleteCancion,
+
+    readAlbumes
 }
