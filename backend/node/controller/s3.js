@@ -23,7 +23,7 @@ function guardarImagen(id, img64) {
 }
 
 function guardarCancion(id, mp3_64) {
-    var nombre = `Canciones/${id}.jpg`;
+    var nombre = `Canciones/${id}.mp3`;
     //Conversión de base64 a bytes
     let buff = new Buffer.from(mp3_64, 'base64');
 
@@ -48,7 +48,9 @@ function getImagen(id) {
     return new Promise((resolve, reject) => {
         S3.getObject(getParams, function (err, data) {
             if (err) {
-                reject(err);
+                //reject(err);
+                console.log(err);
+                resolve ({ image: '' })
             } else {
                 var dataBase64 = Buffer.from(data.Body).toString('base64'); //resgresar de byte a base 64
                 resolve({ image: dataBase64 });
@@ -68,7 +70,9 @@ function getCancion(id) {
     return new Promise((resolve, reject) => {
         S3.getObject(getParams, function (err, data) {
             if (err) {
-                reject(err);
+                //reject(err);
+                console.log(err);
+                resolve ({ song: '' })
             } else {
                 var dataBase64 = Buffer.from(data.Body).toString('base64'); //resgresar de byte a base 64
                 resolve({ song: dataBase64 });

@@ -1,26 +1,22 @@
-var router = require('express').Router()
+var router = require('express').Router();
 
-const { existeArtista, getNombreArtista, createArtista, readArtistas, updateArtista, deleteArtista,
-        createCancion, readCanciones, updateCancion, deleteCancion } = require('../controller/mysql')
+const { getIdArtista, getNombreArtista, createArtista, readArtistas, updateArtista, deleteArtista,
+        getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion } = require('../controller/mysql');
 
-const { guardarImagen } = require('../controller/s3');
+const { guardarImagen, guardarCancion } = require('../controller/s3');
 
 router.post('/crear-artista', async (req, res) => {
     const { nombre, imagen, fecha } = req.body;
     try {
-        const result1 = await existeArtista(nombre);
-        if (!result1.status) {
-            guardarImagen('artistas/'+ nombre, imagen);
-            
+        const existente = await getIdArtista(nombre);
+        if (!existente.status) {
             const result = await createArtista(nombre, fecha);
             if (result.status) {
-                res.status(200).json({ok: true});
-            } else {
-                res.status(400).json({ok: false});
+                guardarImagen('artistas/'+ result.id_artista, imagen);
+                return res.status(200).json({ok: true});
             }
-        } else {
-            res.status(400).json({ok: false});
         }
+        res.status(400).json({ok: false});
     } catch (error) {
         console.log(error);
         res.status(400).json({ok: false});
@@ -70,15 +66,19 @@ router.post('/eliminar-artista', async (req, res) => {
 router.post('/crear-cancion', async (req, res) => {
     const { nombre, imagen, duracion, artista, mp3 } = req.body;
     try {
-        // Pendiente guardar imagen y cancion en S3 y obtener links
-        link_imagen = '';
-        link_mp3 = '';
-        const result = await createCancion(nombre, link_imagen, duracion, artista, link_mp3);
-        if (result.status) {
-            res.status(200).json({ok: true})
-        } else {
-            res.status(400).json({ok: false})
+        const res_artista = await getIdArtista(artista);
+        if (res_artista.status) {
+            const existente = await getIdCancion(nombre, res_artista.id_artista);
+            if (!existente.status) {
+                const result = await createCancion(nombre, duracion, res_artista.id_artista);
+                if (result.status) {
+                    guardarImagen('canciones/'+ result.id_cancion, imagen);
+                    guardarCancion(result.id_cancion, mp3)
+                    return res.status(200).json({ok: true});
+                }   
+            }
         }
+        res.status(400).json({ok: false})
     } catch (error) {
         console.log(error);
         res.status(400).json({ok: false})
@@ -91,7 +91,7 @@ router.get('/get-canciones', async (req, res) => {
         res.status(200).json(result);
     } catch (error) {
         console.log(error);
-        res.status(400).json([]);
+        res.status(400).json({canciones: []});
     }
 });
 

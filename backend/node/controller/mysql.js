@@ -1,5 +1,5 @@
 const conn = require('../database/db.js');
-const { getImagen } = require('../controller/s3');
+const { getImagen, getCancion } = require('../controller/s3');
 
 function loginUsuario(correo, password) {
     return new Promise((resolve, reject) => {
@@ -32,20 +32,24 @@ function registrarUsuario(nombres, apellidos, correo, pass, fecha) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve({ status: true });
+                    resolve({ status: true, id_usuario: result.insertId});
                 }
             }));
     });
 }
 
 //========================================== CRUD ARTISTAS ==========================================
-function existeArtista(nombre) {
+function getIdArtista(nombre) {
     return new Promise((resolve, reject) => {
-        conn.query('SELECT 1 FROM Artistas WHERE nombre = ?', nombre, ((err, result) => {
+        conn.query('SELECT id_artista FROM Artistas WHERE nombre = ?', nombre, ((err, result) => {
             if (err) {
                 reject(err);
             } else {
-                resolve({ status: (result.length > 0)});
+                if (result.length > 0) {
+                    resolve({ status: true, id_artista: result[0].id_artista });
+                } else {
+                    resolve({ status: false });
+                }
              }
         }));
     });
@@ -59,7 +63,7 @@ function createArtista(nombre, fecha_nacimiento) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve({ status: true })
+                    resolve({ status: true, id_artista: result.insertId })
                 }
             });
         } else {
@@ -68,7 +72,7 @@ function createArtista(nombre, fecha_nacimiento) {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve({ status: true })
+                    resolve({ status: true, id_artista: result.insertId })
                 }
             });
         }
@@ -84,7 +88,7 @@ function readArtistas() {
                 let artistas = [];
                 for (let artista of result) {
                     try {
-                        const result = await getImagen('artistas/' + artista.nombre);
+                        const result = await getImagen('artistas/' + artista.id_artista);
                         const string_date = `${artista.fecha_nacimiento.getUTCFullYear()}/${artista.fecha_nacimiento.getUTCMonth()+1}/${artista.fecha_nacimiento.getUTCDate()}`;
                         artistas.push({
                             id: artista.id_artista,
@@ -146,66 +150,63 @@ function deleteArtista(id) {
             if (err) {
                 reject(err);
             } else {
-                resolve({ ok: true})
-            }
-        }));
-    });
-}
-
-//========================================= CRUD CANCIONES ==========================================
-function createCancion(nombre, link_img, duracion, nombre_artista, link_mp3) {//pendiente
-    return new Promise((resolve, reject) => {
-        conn.query('SELECT id FROM Artistas WHERE nombre = ?', nombre_artista, ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (result.length > 0) {//Existe el artista
-                    //pendiente aquí
-                    if (fecha_nacimiento != null) {
-                        conn.query('INSERT INTO Artistas (nombre, foto, fecha_nacimiento) VALUES (?, ?, ?)',
-                        [nombre, link_foto, fecha_nacimiento], (err, result) => {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolve({ status: true })
-                            }
-                        });
-                    } else {
-                        conn.query('INSERT INTO Artistas (nombre, foto) VALUES (?, ?)',
-                        [nombre, link_foto], (err, result) => {
-                            if (err) {
-                                reject(err);
-                            } else {
-                                resolve({ status: true })
-                            }
-                        });
-                    }
+                if (result.affectedRows > 0) {
+                    resolve({ ok: true })
                 } else {
-                    resolve({ status: false });
+                    resolve({ ok: false })
                 }
             }
         }));
     });
 }
 
+//========================================= CRUD CANCIONES ==========================================
+function getIdCancion(nombre, id_artista) {
+    return new Promise((resolve, reject) => {
+        conn.query('SELECT id_cancion FROM Canciones WHERE nombre = ? AND id_artista = ?', [nombre, id_artista], ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.length > 0) {
+                    resolve({ status: true, id_cancion: result[0].id_cancion });
+                } else {
+                    resolve({ status: false });
+                }
+             }
+        }));
+    });
+}
+
+function createCancion(nombre, duracion, id_artista) {
+    return new Promise((resolve, reject) => {     
+        conn.query('INSERT INTO Canciones (nombre, duracion, id_artista) VALUES (?, ?, ?)',
+        [nombre, duracion, id_artista], (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ status: true, id_cancion: result.insertId })
+            }
+        });
+    });
+}
+
 function readCanciones() {
     return new Promise((resolve, reject) => {
-        conn.query(`SELECT c.id_cancion, c.nombre, c.imagen, c.duracion, c.mp3, art.nombre AS artista FROM Artistas art
-                    INNER JOIN Artistas a ON a.id_artista = c.id_artista`, ((err, result) => {
+        conn.query(`SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista FROM Canciones c
+                    INNER JOIN Artistas a ON a.id_artista = c.id_artista`, (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
                 let canciones = [];
                 for (let cancion of result) {
-                    //Pendiente obtener imagen y mp3 en base64 de bucket con cancion.imagen y cancion.mp3
-                    let imagen64 = 'img'
-                    let mp3_64 = 'cancion'
+                    const imagen64 = await getImagen('canciones/' + cancion.id_cancion);
+                    const mp3_64 = await getCancion(cancion.id_cancion);
                     canciones.push({
                         id: cancion.id_cancion,
-                        imagen: imagen64,
+                        imagen: imagen64.image,
                         nombre: cancion.nombre,
                         duracion: cancion.duracion,
-                        mp3: mp3_64,
+                        mp3: mp3_64.song,
                         artista: cancion.artista
                     })
                 }
@@ -276,11 +277,15 @@ function deleteCancion(id) {
                         LEFT JOIN Reproducciones ON Reproducciones.id_cancion = Canciones.id_cancion
                         LEFT JOIN Favoritos ON Favoritos.id_cancion = Canciones.id_cancion
                         LEFT JOIN Playlist_canciones ON Playlist_canciones.id_cancion = Canciones.id_cancion
-                        WHERE id_cancion = ?`, id, ((err, result) => {
+                        WHERE Canciones.id_cancion = ?`, id, ((err, result) => {
             if (err) {
                 reject(err);
             } else {
-                resolve({ ok: true })
+                if (result.affectedRows > 0) {
+                    resolve({ ok: true })
+                } else {
+                    resolve({ ok: false })
+                }
             }
         }));
     });
@@ -293,13 +298,14 @@ module.exports = {
     existeUsuario,
     registrarUsuario,
 
-    existeArtista,
+    getIdArtista,
     getNombreArtista,
     createArtista,
     readArtistas,
     updateArtista,
     deleteArtista,
 
+    getIdCancion,
     createCancion,
     readCanciones,
     updateCancion,
