@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
     try {
         const result = await loginUsuario(correo, pass);
         if (result.status) {
-            res.status(200).json({ok: true})
+            res.status(200).json({ok: true, id_usuario: result.id_usuario})
         } else {
             res.status(400).json({ok: false})
         }

@@ -3,11 +3,16 @@ const { getImagen, getCancion } = require('../controller/s3');
 
 function loginUsuario(correo, password) {
     return new Promise((resolve, reject) => {
-        conn.query('SELECT 1 FROM Usuarios WHERE correo = ? AND password = ?', [correo, password], ((err, result) => {
+        conn.query('SELECT id_usuario FROM Usuarios WHERE correo = ? AND password = ?', [correo, password], ((err, result) => {
             if (err) {
                 reject(err);
             } else {
-                resolve({ status: result.length == 1 });
+                if (result.length > 0) {
+                    resolve({ status: true, id_usuario: result[0].id_usuario });
+                } else {
+                    resolve({ status: false });
+                }
+                
             }
         }));
     });
@@ -88,11 +93,11 @@ function readArtistas() {
                 let artistas = [];
                 for (let artista of result) {
                     try {
-                        const result = await getImagen('artistas/' + artista.id_artista);
+                        const imagen64 = await getImagen('artistas/' + artista.id_artista);
                         const string_date = `${artista.fecha_nacimiento.getUTCFullYear()}/${artista.fecha_nacimiento.getUTCMonth()+1}/${artista.fecha_nacimiento.getUTCDate()}`;
                         artistas.push({
                             id: artista.id_artista,
-                            imagen: result.image,
+                            imagen: imagen64.image,
                             nombre: artista.nombre,
                             nacimiento: string_date
                         })
@@ -315,11 +320,69 @@ function readAlbumes() {
     });
 }
 
+//============================================= BUSCAR =============================================
+function buscar(palabra) {
+    return new Promise((resolve, reject) => {
+        conn.query('SELECT * FROM Canciones WHERE nombre LIKE %?%', palabra, (async (err, result) => {
+            
+        }));
+    });
+}
+
 //=========================================== FAVORITOS ============================================
+function isFavorito() {
+}
+
 function favorito(id_usuario, id_cancion) {
     return new Promise((resolve, reject) => {
-        conn.query('SELECT * FROM Favoritos WHERE id_usuario = ? AND id_cancion = ?', [id_usuario, id_cancion], (async (err, result) => {
+        conn.query('SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cancion = ?', [id_usuario, id_cancion], (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.length > 0) {//Se quita de favoritos
+                    conn.query('DELETE FROM Favoritos WHERE id_usuario = ? AND id_cancion = ?', [id_usuario, id_cancion], ((err, res) => {
+                        if (res.affectedRows > 0) {
+                            resolve({ ok: true })
+                        } else {
+                            resolve({ ok: false })
+                        }
+                    }));
+                } else {//Se agrega a favoritos
+                    conn.query('INSERT INTO Favoritos (id_usuario, id_cancion) VALUES (?, ?)', [id_usuario, id_cancion], ((err, res) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve({ ok: true });
+                        }
+                    }));
+                }
+            }
+        }));
+    });
+}
 
+function getFavoritos(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT c.id_cancion, c.nombre, c.duracion, art.nombre AS artista FROM Favoritos f
+                    LEFT JOIN Canciones c ON c.id_cancion = f.id_cancion
+                    LEFT JOIN Artistas art ON art.id_artista = c.id_artista
+                    WHERE f.id_usuario = ?`, id_usuario, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let canciones = [];
+                for (let cancion of result) {
+                    const imagen64 = await getImagen('canciones/' + cancion.id_cancion);
+                    canciones.push({
+                        id: cancion.id_cancion,
+                        imagen: imagen64.image,
+                        nombre: cancion.nombre,
+                        duracion: cancion.duracion,
+                        artista: cancion.artista
+                    })
+                }
+                resolve({ 'songs': canciones });
+            }
         }));
     });
 }
@@ -342,5 +405,10 @@ module.exports = {
     updateCancion,
     deleteCancion,
 
-    readAlbumes
+    readAlbumes,
+
+    buscar,
+
+    favorito,
+    getFavoritos
 }

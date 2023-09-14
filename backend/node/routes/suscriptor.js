@@ -1,5 +1,7 @@
 var router = require('express').Router();
-const { readCanciones, readAlbumes, readArtistas, favorito } = require('../controller/mysql');
+const { readCanciones, readAlbumes, readArtistas,
+        buscar,
+        favorito, getFavoritos } = require('../controller/mysql');
 
 router.get('/inicio', async (req, res) => {
     try {
@@ -14,13 +16,36 @@ router.get('/inicio', async (req, res) => {
     }
 });
 
-router.post('/favorito', async (req, res) => {
+router.post('/buscar', async (req, res) => {
     try {
-        const id = req.body.id;
-
+        const palabra = req.body.buscar;
+        const result = await buscar(palabra);
+        res.status(200).json(result);
     } catch (error) {
         console.log(error);
-        res.status(400).json({ ok: false })
+        res.status(400).json({ ok: false });
+    }
+});
+
+router.post('/favorito', async (req, res) => {
+    try {
+        const { id_usuario, fav } = req.body;
+        const result = await favorito(id_usuario, fav);
+        res.status(result.ok? 200: 400).json(result);
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ ok: false });
+    }
+});
+
+router.post('/favorites', async (req, res) => {
+    try {
+        const id_usuario = req.body.id_usuario;
+        const result = await getFavoritos(id_usuario);
+        res.status(200).json(result);
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ songs: [] });
     }
 });
 
