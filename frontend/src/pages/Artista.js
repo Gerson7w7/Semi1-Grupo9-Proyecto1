@@ -12,20 +12,20 @@ const Artista = () => {
   const [showError, setShowError] = useState(false);
   const ip = "localhost";
 
-  //   useEffect(() => {
-  //       const url = `http://${ip}:5000/get-artistas`;
+    useEffect(() => {
+        const url = `http://${ip}:5000/get-artistas`;
 
-  //       const fetchData = async () => {
-  //         fetch(url)
-  //           .then((res) => res.json())
-  //           .catch((error) => console.error("Error:", error))
-  //           .then((res) => {
-  //             console.log("res: ", res);
-  //             setArtistas(res.artistas);
-  //           });
-  //       };
-  //       fetchData();
-  //     }, [artistas]);
+        const fetchData = async () => {
+          fetch(url)
+            .then((res) => res.json())
+            .catch((error) => console.error("Error:", error))
+            .then((res) => {
+              console.log("res: ", res);
+              setArtistas(res.artistas);
+            });
+        };
+        fetchData();
+      }, [artistas]);
 
   const crearArtista = () => {
     const reader = new FileReader();
@@ -181,7 +181,7 @@ const Artista = () => {
           <br />
           <h1>Artistas</h1>
           <div class="row g-3">
-            {/* {artistas.map((a) => (
+            {artistas.map((a) => (
               <div class="col">
                 <table class="table table-hover">
                   <tbody>
@@ -370,190 +370,7 @@ const Artista = () => {
                   </tbody>
                 </table>
               </div>
-            ))} */}
-
-            <div class="col">
-              <table class="table table-hover">
-                <tbody>
-                  <tr>
-                    <td class="align-middle">
-                      <img
-                        src="https://bucket.somosohlala.com.ar/s3fs-public/styles/internal_990/public/2023-06/diseno_sin_titulo_1_70.jpg.webp?itok=Zg9cFysC"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
-                    </td>
-                    <td class="align-middle">Duki</td>
-                    <td class="align-middle">Nacimiento: 14/07/1997</td>
-                    <td class="align-middle">
-                      <button
-                        class="btn btn-info"
-                        type="button"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#actualizar"
-                        aria-controls="offcanvasExample"
-                      >
-                        Actualizar
-                      </button>
-                      <div
-                        class="offcanvas offcanvas-start"
-                        tabindex="-1"
-                        id="actualizar"
-                        aria-labelledby="offcanvasExampleLabel"
-                      >
-                        <div class="offcanvas-header">
-                          <h5
-                            class="offcanvas-title"
-                            id="offcanvasExampleLabel"
-                          >
-                            ACTUALIZAR
-                          </h5>
-                          <button
-                            type="button"
-                            class="btn-close text-reset"
-                            data-bs-dismiss="offcanvas"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div class="offcanvas-body">
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label
-                                  for="exampleInputEmail1"
-                                  class="form-label mt-4"
-                                >
-                                  Nombre
-                                </label>
-                                <input
-                                  type="text"
-                                  class="form-control"
-                                  id="exampleInputEmail1"
-                                  aria-describedby="emailHelp"
-                                  placeholder="Duki"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label for="formFile" class="form-label mt-4">
-                                  Imagen
-                                </label>
-                                <input
-                                  class="form-control"
-                                  type="file"
-                                  id="formFile"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label
-                                  for="exampleInputEmail1"
-                                  class="form-label mt-4"
-                                  placeholder="14/07/1997"
-                                >
-                                  Fecha de Nacimiento
-                                </label>
-                                <input
-                                  type="date"
-                                  class="form-control"
-                                  id="exampleInputEmail1"
-                                  aria-describedby="emailHelp"
-                                  placeholder="Ingrese nombre"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <br /> <br />
-                          <div class="row g-3">
-                            <div class="col">
-                              <button
-                                type="button"
-                                class="btn btn-success"
-                                onClick={crearArtista}
-                              >
-                                Actualizar
-                              </button>
-                            </div>
-                          </div>
-                          <div class="row g-3"></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="align-middle">
-                      <button
-                        class="btn btn-danger"
-                        type="button"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasExample"
-                        aria-controls="offcanvasExample"
-                      >
-                        Eliminar
-                      </button>
-                      <div
-                        class="offcanvas offcanvas-start"
-                        tabindex="-1"
-                        id="offcanvasExample"
-                        aria-labelledby="offcanvasExampleLabel"
-                      >
-                        <div class="offcanvas-header">
-                          <h5
-                            class="offcanvas-title"
-                            id="offcanvasExampleLabel"
-                          >
-                            CONFIRMACION
-                          </h5>
-                          <button
-                            type="button"
-                            class="btn-close text-reset"
-                            data-bs-dismiss="offcanvas"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div class="offcanvas-body">
-                          <div>
-                            ¿Está seguro de eliminar este artista? Esta acción
-                            no podrá deshacerse. <br /> Si desea continuar, por
-                            favor ingrese su contraseña.
-                          </div>
-                          <div class="form-group">
-                            <label
-                              for="exampleInputPassword1"
-                              class="form-label mt-4"
-                            >
-                              Contraseña
-                            </label>
-                            <input
-                              type="password"
-                              class="form-control"
-                              id="exampleInputPassword1"
-                              placeholder="Ingrese contraseña"
-                              autocomplete="off"
-                            />
-                            <br />
-                            <button
-                              type="button"
-                              class="btn btn-warning"
-                              onClick={() => eliminarArtista("1")}
-                            >
-                              Confirmar
-                            </button>
-                          </div>
-                          <br />
-                          {showError && mostrarError()}
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            ))}
           </div>
         </div>
       </div>

@@ -43,6 +43,7 @@ const Login = () => {
           .then((res) => {
             console.log("res: ", res);
             inicioExitoso = res.exito; // true o false
+            localStorage.setItem("id_usuario", res.id_usuario);
           });
       };
       fetchData();

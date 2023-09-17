@@ -14,20 +14,20 @@ const Cancion = () => {
   const [showError, setShowError] = useState(false);
   const ip = "localhost";
 
-  //   useEffect(() => {
-  //       const url = `http://${ip}:5000/get-canciones`;
+  useEffect(() => {
+    const url = `http://${ip}:5000/get-canciones`;
 
-  //       const fetchData = async () => {
-  //         fetch(url)
-  //           .then((res) => res.json())
-  //           .catch((error) => console.error("Error:", error))
-  //           .then((res) => {
-  //             console.log("res: ", res);
-  //             setCanciones(res.canciones);
-  //           });
-  //       };
-  //       fetchData();
-  //     }, [canciones]);
+    const fetchData = async () => {
+      fetch(url)
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((res) => {
+          console.log("res: ", res);
+          setCanciones(res.canciones);
+        });
+    };
+    fetchData();
+  }, [canciones]);
 
   const crearCancion = () => {
     const reader = new FileReader();
@@ -229,7 +229,7 @@ const Cancion = () => {
           <br />
           <h1>Canciones</h1>
           <div class="row g-3">
-            {/* {canciones.map((c) => (
+            {canciones.map((c) => (
               <div class="col">
                 <table class="table table-hover">
                   <tbody>
@@ -458,241 +458,7 @@ const Cancion = () => {
                   </tbody>
                 </table>
               </div>
-            ))} */}
-
-            <div class="col">
-              <table class="table table-hover">
-                <tbody>
-                  <tr>
-                    <td class="align-middle">
-                      <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
-                    </td>
-                    <td class="align-middle">Givenchy</td>
-                    <td class="align-middle">3 min</td>
-                    <td class="align-middle">Duki</td>
-                    <td class="align-middle">
-                      <button
-                        class="btn btn-info"
-                        type="button"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#actualizar"
-                        aria-controls="offcanvasExample"
-                      >
-                        Actualizar
-                      </button>
-                      <div
-                        class="offcanvas offcanvas-start"
-                        tabindex="-1"
-                        id="actualizar"
-                        aria-labelledby="offcanvasExampleLabel"
-                      >
-                        <div class="offcanvas-header">
-                          <h5
-                            class="offcanvas-title"
-                            id="offcanvasExampleLabel"
-                          >
-                            ACTUALIZAR
-                          </h5>
-                          <button
-                            type="button"
-                            class="btn-close text-reset"
-                            data-bs-dismiss="offcanvas"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div class="offcanvas-body">
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label
-                                  for="exampleInputEmail1"
-                                  class="form-label mt-4"
-                                >
-                                  Nombre
-                                </label>
-                                <input
-                                  type="text"
-                                  class="form-control"
-                                  id="exampleInputEmail1"
-                                  aria-describedby="emailHelp"
-                                  placeholder="Duki"
-                                  onChange={(event) =>
-                                    setNombre(event.target.value)
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label for="formFile" class="form-label mt-4">
-                                  Imagen
-                                </label>
-                                <input
-                                  class="form-control"
-                                  type="file"
-                                  id="formFile"
-                                  onClick={(event) =>
-                                    setImagen(event.target.files[0])
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label
-                                  for="exampleInputEmail1"
-                                  class="form-label mt-4"
-                                >
-                                  Duración (en minutos)
-                                </label>
-                                <input
-                                  type="number"
-                                  class="form-control"
-                                  id="exampleInputEmail1"
-                                  aria-describedby="emailHelp"
-                                  placeholder="Ingrese la duración de la canción"
-                                  onChange={(event) =>
-                                    setDuracion(event.target.value)
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label
-                                  for="exampleInputEmail1"
-                                  class="form-label mt-4"
-                                >
-                                  Artista
-                                </label>
-                                <input
-                                  type="text"
-                                  class="form-control"
-                                  id="exampleInputEmail1"
-                                  aria-describedby="emailHelp"
-                                  placeholder="Ingrese nombre de artista"
-                                  onChange={(event) =>
-                                    setArtista(event.target.value)
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row g-3">
-                            <div class="col">
-                              <div class="form-group">
-                                <label for="formFile" class="form-label mt-4">
-                                  Archivo mp3
-                                </label>
-                                <input
-                                  class="form-control"
-                                  type="file"
-                                  id="formFile"
-                                  onChange={(event) =>
-                                    setMp3(event.target.files[0])
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <br /> <br />
-                          <div class="row g-3">
-                            <div class="col">
-                              <button
-                                type="button"
-                                class="btn btn-success"
-                                onClick={() => actualizarCancion("1")}
-                              >
-                                Confirmar
-                              </button>
-                            </div>
-                          </div>
-                          <div class="row g-3"></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="align-middle">
-                      <button
-                        class="btn btn-danger"
-                        type="button"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasExample"
-                        aria-controls="offcanvasExample"
-                      >
-                        Eliminar
-                      </button>
-                      <div
-                        class="offcanvas offcanvas-start"
-                        tabindex="-1"
-                        id="offcanvasExample"
-                        aria-labelledby="offcanvasExampleLabel"
-                      >
-                        <div class="offcanvas-header">
-                          <h5
-                            class="offcanvas-title"
-                            id="offcanvasExampleLabel"
-                          >
-                            CONFIRMACION
-                          </h5>
-                          <button
-                            type="button"
-                            class="btn-close text-reset"
-                            data-bs-dismiss="offcanvas"
-                            aria-label="Close"
-                          ></button>
-                        </div>
-                        <div class="offcanvas-body">
-                          <div>
-                            ¿Está seguro de eliminar este artista? Esta acción
-                            no podrá deshacerse. <br /> Si desea continuar, por
-                            favor ingrese su contraseña.
-                          </div>
-                          <div class="form-group">
-                            <label
-                              for="exampleInputPassword1"
-                              class="form-label mt-4"
-                            >
-                              Contraseña
-                            </label>
-                            <input
-                              type="password"
-                              class="form-control"
-                              id="exampleInputPassword1"
-                              placeholder="Ingrese contraseña"
-                              autocomplete="off"
-                              onChange={(event) =>
-                                setPassword(event.target.value)
-                              }
-                            />
-                            <br />
-                            <button
-                              type="button"
-                              class="btn btn-warning"
-                              onClick={() => eliminarCancion("1")}
-                            >
-                              Confirmar
-                            </button>
-                          </div>
-                          <br />
-                          {showError && mostrarError()}
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            ))}
           </div>
         </div>
       </div>

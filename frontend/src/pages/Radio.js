@@ -2,42 +2,38 @@ import React from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/PaginaPrincipal.css";
 import AudioPlayer from "../components/Reproductor";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-const PaginaPrincipal = () => {
-  // const [canciones, setCanciones] = useState([]);
-  // const [albums, setAlbums] = useState([]);
-  // const [artistas, setArtistas] = useState([]);
+const Radio = () => {
+  const [tracks, setTracks] = useState([]);
   const ip = "localhost";
 
-  // useEffect(() => {
-  // 0 = canción
-  // 1 = album
-  // 2 = artista
-  // const url = `http://${ip}:5000/reproducir`;
-  // let data = { id: id, tipo: tipo};
-  // const fetchData = async () => {
-  //   fetch(url, {
-  //     method: "POST",
-  //     body: JSON.stringify(data),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .catch((error) => console.error("Error:", error))
-  //     .then((res) => {
-  //       const tracksAux = res.tracks
-  //       let tracks = []
-  //       for (const t of tracksAux) {
-  //         tracks.push(t.url)
-  //       }
-  //       // seteamos la cola de tracks
-  //       localStorage.setItem("audioTracks", tracks);
-  //     });
-  // };
-  // fetchData();
-  // }, []);
+  useEffect(() => {
+    // 0 = canción
+    // 1 = album
+    // 2 = artista
+    const url = `http://${ip}:5000/reproducir`;
+    const fetchData = async () => {
+      fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((res) => {
+          const tracksAux = res.tracks;
+          let tracksL = [];
+          for (const t of tracksAux) {
+            tracksL.push(t.url);
+          }
+          // seteamos la cola de tracks
+          setTracks(tracksL);
+        });
+    };
+    fetchData();
+  }, []);
 
   return (
     <main>
@@ -53,9 +49,9 @@ const PaginaPrincipal = () => {
           />
         </div>
       </div>
-      <AudioPlayer />
+      <AudioPlayer audioTracks={tracks} />
     </main>
   );
 };
 
-export default PaginaPrincipal;
+export default Radio;

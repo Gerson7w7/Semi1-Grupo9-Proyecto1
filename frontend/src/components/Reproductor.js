@@ -3,9 +3,10 @@ import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import "../assets/styles/Reproductor.css";
 
-const AudioPlayer = () => {
+const AudioPlayer = (props) => {
   const playerRef = useRef(null);
-  const { audioTracks } = ["URL", "URL"]
+  const { audioTracks } = props
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
   useEffect(() => {
     // Inicializa el reproductor cuando el componente esté montado
@@ -15,11 +16,13 @@ const AudioPlayer = () => {
   }, []);
 
   const handlePlayNext = () => {
-    
+    const nextIndex = (currentTrackIndex + 1);
+    setCurrentTrackIndex(nextIndex);
   };
 
   const handlePlayPrev = () => {
-    
+    const prevIndex = (currentTrackIndex - 1);
+    setCurrentTrackIndex(prevIndex);
   };
 
   useEffect(() => {

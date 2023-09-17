@@ -5,12 +5,12 @@ import { useState } from "react";
 import AudioPlayer from "../components/Reproductor";
 
 const Buscar = () => {
-  const [isFavorite, setIsFavorite] = useState(false);
   const [favoritos, setFavoritos] = useState([]);
   const [canciones, setCanciones] = useState([]);
   const [albums, setAlbums] = useState([]);
   const [artistas, setArtistas] = useState([]);
   const [buscar, setBuscar] = useState('');
+  const [tracks, setTracks] = useState([]);
   const ip = "localhost";
 
   const buscarFn = () => {
@@ -47,7 +47,7 @@ const Buscar = () => {
 
     const url = `http://${ip}:5000/favorito`;
     const fetchData = async () => {
-      let data = { fav: id };
+      let data = { fav: id, id_usuario: localStorage.getItem("id_usuario")};
       fetch(url, {
         method: "POST",
         body: JSON.stringify(data),
@@ -62,8 +62,33 @@ const Buscar = () => {
     fetchData();
   };
 
-  const reproducir = (id) => {
-    console.log("reproduciendo...", id);
+  const reproducir = (id, tipo) => {
+    // 0 = canción
+    // 1 = album
+    // 2 = artista
+    const url = `http://${ip}:5000/reproducir`;
+      let data = { id: id, tipo: tipo};
+      const fetchData = async () => {
+        fetch(url, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .catch((error) => console.error("Error:", error))
+          .then((res) => {
+            const tracksAux = res.tracks
+            let tracksL = []
+            for (const t of tracksAux) {
+              tracksL.push(t.url)
+            }
+            // seteamos la cola de tracks
+            setTracks(tracksL)
+          });
+      };
+      fetchData();
   };
 
   return (
@@ -81,7 +106,7 @@ const Buscar = () => {
               aria-describedby="button-addon2"
               onChange={(event) => setBuscar(event.target.value)}
             />
-            <button class="btn btn-primary" type="button" id="button-addon2">
+            <button class="btn btn-primary" type="button" id="button-addon2" onClick={buscarFn}>
               <img
                 class="bi pe-none me-2"
                 src="https://www.liberty.edu/staging/library/wp-content/uploads/sites/193/2021/03/magnifying-glass-icon-white.png"
@@ -99,7 +124,7 @@ const Buscar = () => {
             <div class="col">
               <table class="table table-hover">
                 <tbody>
-                  {/* {canciones.map((c, index) => (
+                  {canciones.map((c, index) => (
                     <tr>
                       <th scope="row" class="align-middle">
                         <img src={c.imagen} alt="" width="100" height="60" />
@@ -131,7 +156,7 @@ const Buscar = () => {
                           <button
                             type="button"
                             class="btn btn-sm"
-                            onClick={() => reproducir(c.id)}
+                            onClick={() => reproducir(c.id, 0)}
                           >
                             <img
                               class="bi pe-none me-2"
@@ -144,52 +169,7 @@ const Buscar = () => {
                         </div>
                       </td>
                     </tr>
-                  ))} */}
-                  <tr>
-                    <th scope="row" class="align-middle">
-                      <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
-                    </th>
-                    <td class="align-middle">Givenchy</td>
-                    <td class="align-middle">Duki</td>
-                    <td class="align-middle">3 mins</td>
-                    <td class="text-end align-middle">
-                      <div class="btn-group">
-                        <button
-                          type="button"
-                          class={`btn btn-sm  ${
-                            isFavorite ? "btn-success" : "btn-secondary"
-                          } favorite-button`}
-                          onClick={() => setIsFavorite(!isFavorite)}
-                        >
-                          <img
-                            class="bi pe-none me-2"
-                            src="https://cdn-icons-png.flaticon.com/512/73/73814.png"
-                            alt=""
-                            width="50"
-                            height="50"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                    <td class="text-end align-middle">
-                      <div class="btn-group">
-                        <button type="button" class="btn btn-sm">
-                          <img
-                            class="bi pe-none me-2"
-                            src="https://cdn-icons-png.flaticon.com/512/1709/1709973.png"
-                            alt=""
-                            width="50"
-                            height="50"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -197,7 +177,7 @@ const Buscar = () => {
 
           <h1>Albumes</h1>
           <div class="row g-3">
-            {/* {albums.map((a) => (
+            {albums.map((a) => (
               <div class="col">
                 <table class="table table-hover">
                   <thead>
@@ -238,7 +218,7 @@ const Buscar = () => {
                             <button
                               type="button"
                               class="btn btn-sm"
-                              onClick={() => reproducir(c.id)}
+                              onClick={() => reproducir(c.id, 1)}
                             >
                               <img
                                 class="bi pe-none me-2"
@@ -255,91 +235,12 @@ const Buscar = () => {
                   </tbody>
                 </table>
               </div>
-            ))} */}
-            <div class="col">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th scope="col" class="align-middle">
-                      <img
-                        src="https://www.lahiguera.net/musicalia/artistas/varios/disco/12974/duki_antes_de_ameri-portada.jpg"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
-                    </th>
-                    <th scope="col" class="align-middle">
-                      Antes de Ameri
-                    </th>
-                    <th scope="col" class="align-middle">
-                      Duki
-                    </th>
-                    <th scope="col" class="align-middle">
-                      Descripcion
-                      dasfdasfdsfsdfsdfadssfadfasdfadsfadfasdffsda...
-                    </th>
-                    <th scope="col" class="text-end align-middle"></th>
-                    <th scope="col" class="text-end align-middle"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row" class="align-middle">
-                      <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
-                    </th>
-                    <td class="align-middle">Givenchy</td>
-                    <td class="align-middle">Duki</td>
-                    <td class="align-middle">3 mins</td>
-                    <td class="text-end align-middle">
-                      <div class="btn-group">
-                        <button
-                          type="button"
-                          class={`btn btn-sm  ${
-                            isFavorite ? "btn-success" : "btn-secondary"
-                          } favorite-button`}
-                          onClick={() => setIsFavorite(!isFavorite)}
-                        >
-                          <img
-                            class="bi pe-none me-2"
-                            src="https://cdn-icons-png.flaticon.com/512/73/73814.png"
-                            alt=""
-                            width="50"
-                            height="50"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                    <td class="text-end align-middle">
-                      <div class="btn-group">
-                        <button
-                          type="button"
-                          class="btn btn-sm"
-                          // onClick={() => reproducir("5")}
-                        >
-                          <img
-                            class="bi pe-none me-2"
-                            src="https://cdn-icons-png.flaticon.com/512/1709/1709973.png"
-                            alt=""
-                            width="50"
-                            height="50"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            ))}
           </div>
 
           <h1>Artistas</h1>
           <div class="row g-3">
-            {/* {artistas.map((a) => (
+            {artistas.map((a) => (
               <div class="col">
                 <table class="table table-hover">
                   <thead>
@@ -378,7 +279,7 @@ const Buscar = () => {
                             <button
                               type="button"
                               class="btn btn-sm"
-                              onClick={() => reproducir(c.id)}
+                              onClick={() => reproducir(c.id, 2)}
                             >
                               <img
                                 class="bi pe-none me-2"
@@ -395,87 +296,11 @@ const Buscar = () => {
                   </tbody>
                 </table>
               </div>
-            ))} */}
-            <div class="col">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th scope="col" class="align-middle">
-                      <img
-                        src="https://bucket.somosohlala.com.ar/s3fs-public/styles/internal_990/public/2023-06/diseno_sin_titulo_1_70.jpg.webp?itok=Zg9cFysC"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
-                    </th>
-                    <th scope="col" class="align-middle">
-                      Duki
-                    </th>
-                    <th scope="col" class="align-middle">
-                      Nacimiento: 14/07/1997
-                    </th>
-                    <th scope="col" class="align-middle"></th>
-                    <th scope="col" class="text-end align-middle"></th>
-                    <th scope="col" class="text-end align-middle"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row" class="align-middle">
-                      <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
-                    </th>
-                    <td class="align-middle">Givenchy</td>
-                    <td class="align-middle">Duki</td>
-                    <td class="align-middle">3 mins</td>
-                    <td class="text-end align-middle">
-                      <div class="btn-group">
-                        <button
-                          type="button"
-                          class={`btn btn-sm  ${
-                            isFavorite ? "btn-success" : "btn-secondary"
-                          } favorite-button`}
-                          onClick={() => setIsFavorite(!isFavorite)}
-                        >
-                          <img
-                            class="bi pe-none me-2"
-                            src="https://cdn-icons-png.flaticon.com/512/73/73814.png"
-                            alt=""
-                            width="50"
-                            height="50"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                    <td class="text-end align-middle">
-                      <div class="btn-group">
-                        <button
-                          type="button"
-                          class="btn btn-sm"
-                          // onClick={() => reproducir("5")}
-                        >
-                          <img
-                            class="bi pe-none me-2"
-                            src="https://cdn-icons-png.flaticon.com/512/1709/1709973.png"
-                            alt=""
-                            width="50"
-                            height="50"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            ))}
           </div>
         </div>
       </div>
-        <AudioPlayer />
+        <AudioPlayer audioTracks={tracks} />
     </main>
   );
 };
