@@ -89,12 +89,12 @@ A continuación se presenta el diagrama entidad relación de la base de datos de
 
 ## RDS
 
-# Conclusiones Profesionales
+# Conclusiones
 
-1. **Arquitectura Escalable en la Nube:** La implementación de una arquitectura en la nube con servicios de AWS, como EC2, S3, y RDS/DynamoDB, permite una escalabilidad eficiente y una gestión simplificada de recursos, garantizando que la aplicación de transmisión de música pueda crecer con la demanda.
+1. La arquitectura escalable en la nube se basa en la implementación de una arquitectura en la nube con servicios de AWS, como EC2, S3, y RDS/DynamoDB, permite una escalabilidad eficiente y una gestión simplificada de recursos, garantizando que la aplicación de transmisión de música pueda crecer con la demanda.
 
-2. **Seguridad de Datos Mejorada:** La utilización de políticas de IAM para gestionar el acceso a los servicios de AWS y el almacenamiento encriptado de contraseñas en la base de datos RDS o DynamoDB refuerza la seguridad de los datos del usuario y reduce los riesgos de filtraciones de información.
+2. En conclusión la seguridad de datos mejorada en la utilización de políticas de IAM para gestionar el acceso a los servicios de AWS y el almacenamiento encriptado de contraseñas en la base de datos RDS o DynamoDB refuerza la seguridad de los datos del usuario y reduce los riesgos de filtraciones de información.
 
-3. **Alta Disponibilidad y Tolerancia a Fallos:** El uso de instancias EC2 idénticas y un balanceador de carga permite mantener una alta disponibilidad de la aplicación, garantizando que los usuarios puedan acceder a ella incluso en caso de fallos en una instancia.
+3. Se observó que en la alta disponibilidad y tolerancia a fallos el uso de instancias EC2 idénticas y un balanceador de carga permite mantener una alta disponibilidad de la aplicación, garantizando que los usuarios puedan acceder a ella incluso en caso de fallos en una instancia.
 
-4. **Eficiencia en el Almacenamiento de Multimedia:** La organización de archivos multimedia en buckets de S3 separados para imágenes y canciones simplifica la gestión de recursos multimedia y facilita la entrega de contenido multimedia a los usuarios de la aplicación de manera eficiente.
+4. La eficiencia en el almacenamiento de multimedia es la organización de archivos multimedia en buckets de S3 separados para imágenes y canciones simplifica la gestión de recursos multimedia y facilita la entrega de contenido multimedia a los usuarios de la aplicación de manera eficiente.
