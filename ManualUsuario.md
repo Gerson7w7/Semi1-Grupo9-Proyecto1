@@ -83,10 +83,10 @@ La sección de "Perfil" permite a los usuarios ver y editar su información pers
 
 En la sección "Editar Perfil", los usuarios pueden realizar cambios en su información de perfil, como actualizar la imagen de perfil y cambiar la contraseña.
 
-<img src="imgs/editarperfil.jpg" alt="Vista de la sección de Login">
+<img src="imgs/editarpefil.jpg" alt="Vista de la sección de Login">
 
 ## Histórico
 
 La sección de "Histórico" muestra un registro de las canciones que el usuario ha escuchado anteriormente.
 
-<img src="imgs/historico.jpg" alt="Vista de la sección de Login">
+<img src="imgs/historicos.jpg" alt="Vista de la sección de Login">
