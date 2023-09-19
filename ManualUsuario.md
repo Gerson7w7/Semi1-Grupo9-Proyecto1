@@ -41,4 +41,52 @@ Para comenzar a disfrutar de la música en nuestra aplicación, siga estos simpl
 
 6. **Configuración del Perfil:** Personalice su perfil con una imagen y ajuste sus preferencias musicales en la sección de configuración de la cuenta.
 
+# Secciones de la Aplicación
 
+## Login
+
+En la sección de "Login", los usuarios pueden ingresar a sus cuentas proporcionando su nombre de usuario y contraseña.
+
+<img src="imgs/login.jpg" alt="Vista de la sección de Login">
+
+## Admin
+
+La sección de "Admin" está diseñada para los administradores de la aplicación y les permite gestionar usuarios, contenido y configuración.
+
+<img src="imgs/admin.jpg" alt="Vista de la sección de Login">
+
+## Playlist
+
+En la sección de "Playlist", los usuarios pueden crear y gestionar listas de reproducción personalizadas con sus canciones favoritas.
+
+<img src="imgs/playlist.jpg" alt="Vista de la sección de Login">
+
+## InPlaylist
+
+La sección "InPlaylist" muestra detalles y contenido de una lista de reproducción específica seleccionada por el usuario.
+
+<img src="imgs/inplaylist.jpg" alt="Vista de la sección de Login">
+
+## Favoritas
+
+En la sección "Favoritas", los usuarios pueden acceder rápidamente a sus canciones y álbumes favoritos almacenados.
+
+<img src="imgs/favoritas.jpg" alt="Vista de la sección de Login">
+
+## Perfil
+
+La sección de "Perfil" permite a los usuarios ver y editar su información personal y configuración de cuenta.
+
+<img src="imgs/perfill.jpg" alt="Vista de la sección de Login">
+
+## Editar Perfil
+
+En la sección "Editar Perfil", los usuarios pueden realizar cambios en su información de perfil, como actualizar la imagen de perfil y cambiar la contraseña.
+
+<img src="imgs/editarperfil.jpg" alt="Vista de la sección de Login">
+
+## Histórico
+
+La sección de "Histórico" muestra un registro de las canciones que el usuario ha escuchado anteriormente.
+
+<img src="imgs/historico.jpg" alt="Vista de la sección de Login">

@@ -47,7 +47,7 @@ La arquitectura del proyecto consta de varios componentes clave que trabajan jun
 
 A continuación se presenta el diagrama entidad relación de la base de datos de la aplicación:
 
-<img src="mer.png" alt="Diagrama Entidad Relación">
+<img src="imgs/mer.png" alt="Diagrama Entidad Relación">
 
 # Usuarios IAM y Políticas Asociadas
 
