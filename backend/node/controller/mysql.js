@@ -492,6 +492,76 @@ function readCancionesPlaylist(id_playlist) {
     });
 }
 
+
+//============================================ HISTÓRICO ============================================
+function getTopCanciones(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT c.nombre, a.nombre AS artista, r.contador AS veces FROM Reproducciones r
+                    LEFT JOIN Canciones c ON c.id_cancion = r.id_cancion
+                    INNER JOIN Artistas a ON a.id_artista = c.id_artista
+                    WHERE r.id_usuario = ?
+                    ORDER BY veces DESC`, id_usuario, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ 'canciones': result });
+            }
+        }));
+    });
+}
+
+function getTopArtistas(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT a.nombre, SUM(r.contador) AS veces FROM Reproducciones r
+                    INNER JOIN Canciones c ON c.id_cancion = r.id_cancion
+                    INNER JOIN Artistas a ON a.id_artista = c.id_artista
+                    WHERE r.id_usuario = ?
+                    GROUP BY a.nombre
+                    ORDER BY veces DESC`, id_usuario, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ 'artistas': result });
+            }
+        }));
+    });
+}
+
+function getTopAlbums(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT alb.nombre, a.nombre AS artista, SUM(r.contador) AS veces FROM Reproducciones r
+                    INNER JOIN Canciones c ON c.id_cancion = r.id_cancion
+                    INNER JOIN Albumes alb ON alb.id_album = c.id_album
+                    INNER JOIN Artistas a ON a.id_artista = alb.id_artista
+                    WHERE r.id_usuario = ?
+                    GROUP BY alb.nombre
+                    ORDER BY veces DESC`, id_usuario, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ 'albums': result });
+            }
+        }));
+    });
+}
+
+function getHistorial(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT c.nombre, a.nombre AS artista, c.duracion FROM Reproducciones r
+                    INNER JOIN Canciones c ON c.id_cancion = r.id_cancion
+                    INNER JOIN Artistas a ON a.id_artista = alb.id_artista
+                    WHERE r.id_usuario = ?
+                    GROUP BY alb.nombre
+                    ORDER BY r.orden DESC`, id_usuario, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ 'canciones': result });
+            }
+        }));
+    });
+}
+
 module.exports = {
     loginUsuario,
     existeUsuario,
@@ -522,5 +592,10 @@ module.exports = {
     readPlaylists,
     addCancionPlaylist,
     deleteCancionPlaylist,
-    readCancionesPlaylist
+    readCancionesPlaylist,
+
+    getTopCanciones,
+    getTopArtistas,
+    getTopAlbums,
+    getHistorial
 }

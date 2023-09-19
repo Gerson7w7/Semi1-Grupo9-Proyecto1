@@ -2,7 +2,8 @@ var router = require('express').Router();
 const { readCanciones, readAlbumes, readArtistas,
         buscar,
         favorito, getFavoritos,
-        getIdPlaylist, createPlaylist, readPlaylists, addCancionPlaylist, deleteCancionPlaylist, readCancionesPlaylist } = require('../controller/mysql');
+        getIdPlaylist, createPlaylist, readPlaylists, addCancionPlaylist, deleteCancionPlaylist, readCancionesPlaylist,
+        getTopCanciones, getTopArtistas, getTopAlbums, getHistorial } = require('../controller/mysql');
 
 router.get('/inicio', async (req, res) => {
     try {
@@ -69,7 +70,7 @@ router.post('/playlist', async (req, res) => {
     }
 });
 
-router.get('/playlist', async (req, res) => {
+router.post('/playlist', async (req, res) => {
     try {
         const id_usuario = req.body.id_usuario;
         const result = await readPlaylists(id_usuario);
@@ -96,7 +97,7 @@ router.post('/playlist/add-song', async(req, res) => {
 });
 
 
-router.get('/playlist/delete-song', async(req, res) => {
+router.post('/playlist/delete-song', async(req, res) => {
     try {
         const { id_usuario, id_cancion, nombre_playlist } = req.body;
         const playlist = await getIdPlaylist(id_usuario, nombre_playlist);
@@ -111,7 +112,7 @@ router.get('/playlist/delete-song', async(req, res) => {
     }
 });
 
-router.get('/inplaylist/', async(req, res) => {
+router.post('/inplaylist/', async(req, res) => {
     try {
         const { id_usuario, nombre } = req.body;
         const playlist = await getIdPlaylist(id_usuario, nombre);
@@ -123,6 +124,21 @@ router.get('/inplaylist/', async(req, res) => {
     } catch (error) {
         console.log(error);
         res.status(400).json({ songs: [] })
+    }
+});
+
+router.post('/historial', async(req, res) => {
+    try {
+        const id_usuario = req.body.id_usuario;
+        const topC = await getTopCanciones(id_usuario);
+        const topA = await getTopArtistas(id_usuario);
+        const topAlb = await getTopAlbums(id_usuario);
+        const historialC = await getHistorial(id_usuario);
+        return res.status(200).json({ cancionesRep: topC.canciones, artistaRep: topA.artistas,
+                                      albumRep: topAlb.albums, historial: historialC.canciones });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ cancionesRep: [], artistaRep: [], albumRep: [], historial: [] })
     }
 });
 
