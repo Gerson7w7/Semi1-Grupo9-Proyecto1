@@ -330,9 +330,6 @@ function buscar(palabra) {
 }
 
 //=========================================== FAVORITOS ============================================
-function isFavorito() {
-}
-
 function favorito(id_usuario, id_cancion) {
     return new Promise((resolve, reject) => {
         conn.query('SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cancion = ?', [id_usuario, id_cancion], (async (err, result) => {
@@ -387,6 +384,114 @@ function getFavoritos(id_usuario) {
     });
 }
 
+//========================================= CRUD PLAYLISTS ==========================================
+function getIdPlaylist(id_usuario, nombre) {
+    return new Promise((resolve, reject) => {
+        conn.query('SELECT id_playlist FROM Playlists WHERE id_usuario = ? AND nombre = ?', [id_usuario, nombre], ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.length > 0) {
+                    resolve({ status: true, id_playlist: result[0].id_playlist });
+                } else {
+                    resolve({ status: false });
+                }
+             }
+        }));
+    });
+}
+
+function createPlaylist(id_usuario, nombre, descripcion) {
+    return new Promise((resolve, reject) => {
+        descripcion = descripcion? descripcion : '';
+        conn.query('INSERT INTO Playlists (nombre, descripcion, id_usuario) VALUES (?, ?, ?)', [nombre, descripcion, id_usuario], (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ status: true, id_playlist: result.insertId, listado_playlists: await readPlaylists(id_usuario) });
+            }
+        }));
+    });
+}
+
+function readPlaylists(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT id_playlist, nombre, descripcion, imagen FROM Playlists
+                    WHERE id_usuario = ?`, id_usuario, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let playlists = [];
+                for (let playlist of result) {
+                    const imagen64 = await getImagen('playlists/' + playlist.id_playlists);
+                    playlists.push({
+                        nombre: playlist.nombre,
+                        descripcion: playlist.descripcion,
+                        imagen: imagen64.image
+                    })
+                }
+                resolve({ 'playlist': playlists });
+            }
+        }));
+    });
+}
+
+function addCancionPlaylist(id_cancion, id_playlist) {
+    return new Promise((resolve, reject) => {
+        conn.query('INSERT INTO Playlist_canciones (id_playlist, id_cancion) VALUES (?, ?)',
+                   [id_playlist, id_cancion], (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                const canciones = await readCancionesPlaylist(id_playlist);
+                resolve({ 'songs': canciones.canciones });
+            }
+        }));
+    });
+}
+
+function deleteCancionPlaylist(id_cancion, id_playlist) {
+    return new Promise((resolve, reject) => {
+        conn.query('DELETE FROM Playlist_canciones WHERE id_playlist = ? AND id_cancion = ?',
+                   [id_playlist, id_cancion], (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                const canciones = await readCancionesPlaylist(id_playlist);
+                resolve({ 'songs': canciones.canciones });
+            }
+        }));
+    });
+}
+
+function readCancionesPlaylist(id_playlist) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista FROM Playlist_canciones pc
+                    LEFT JOIN Canciones c ON c.id_cancion = pc.id_cancion
+                    INNER JOIN Artistas a ON a.id_artista = c.id_artista
+                    WHERE pc.id_playlist = ?`, id_playlist, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let canciones = [];
+                for (let cancion of result) {
+                    const imagen64 = await getImagen('canciones/' + cancion.id_cancion);
+                    const mp3_64 = await getCancion(cancion.id_cancion);
+                    canciones.push({
+                        id: cancion.id_cancion,
+                        imagen: imagen64.image,
+                        nombre: cancion.nombre,
+                        duracion: cancion.duracion,
+                        mp3: mp3_64.song,
+                        artista: cancion.artista
+                    })
+                }
+                resolve({ 'canciones': canciones });
+            }
+        }));
+    });
+}
+
 module.exports = {
     loginUsuario,
     existeUsuario,
@@ -410,5 +515,12 @@ module.exports = {
     buscar,
 
     favorito,
-    getFavoritos
+    getFavoritos,
+
+    getIdPlaylist,
+    createPlaylist,
+    readPlaylists,
+    addCancionPlaylist,
+    deleteCancionPlaylist,
+    readCancionesPlaylist
 }

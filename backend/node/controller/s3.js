@@ -52,7 +52,7 @@ function getImagen(id) {
                 console.log(err);
                 resolve ({ image: '' })
             } else {
-                var dataBase64 = Buffer.from(data.Body).toString('base64'); //resgresar de byte a base 64
+                var dataBase64 = Buffer.from(data.Body).toString('base64'); //regresar de byte a base 64
                 resolve({ image: dataBase64 });
             }
         });
