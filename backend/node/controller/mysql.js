@@ -1,7 +1,7 @@
 const conn = require('../database/db.js');
 const { guardarImagen } = require('../controller/s3');
 const { getImagen, getCancion } = require('../controller/s3');
-const prefijoBucket = 'https://semi1-ht-p1-202004707.s3.amazonaws.com/';
+const prefijoBucket = 'https://multimedia-semi1-g9.s3.amazonaws.com/';
 
 function loginUsuario(correo, password) {
     return new Promise((resolve, reject) => {

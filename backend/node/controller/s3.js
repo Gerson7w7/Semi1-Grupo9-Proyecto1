@@ -1,5 +1,5 @@
 var AWS = require('aws-sdk');
-const bucket = 'semi1-ht-p1-202004707';
+const bucket = 'multimedia-semi1-g9';
 
 AWS.config.update({
     region: process.env.REGION,
