@@ -1,5 +1,7 @@
 const conn = require('../database/db.js');
+const { guardarImagen } = require('../controller/s3');
 const { getImagen, getCancion } = require('../controller/s3');
+const prefijoBucket = 'https://semi1-ht-p1-202004707.s3.amazonaws.com/';
 
 function loginUsuario(correo, password) {
     return new Promise((resolve, reject) => {
@@ -93,12 +95,11 @@ function readArtistas() {
                 let artistas = [];
                 for (let artista of result) {
                     try {
-                        const imagen64 = await getImagen('artistas/' + artista.id_artista);
                         const string_date = `${artista.fecha_nacimiento.getUTCFullYear()}/${artista.fecha_nacimiento.getUTCMonth()+1}/${artista.fecha_nacimiento.getUTCDate()}`;
                         artistas.push({
                             id: artista.id_artista,
-                            imagen: imagen64.image,
                             nombre: artista.nombre,
+                            imagen: `${prefijoBucket}Fotos/artistas/${artista.id_artista}.jpg`,
                             nacimiento: string_date
                         })
                     } catch (err) {
@@ -145,13 +146,7 @@ function updateArtista(id, nombre, fecha) {
 
 function deleteArtista(id) {
     return new Promise((resolve, reject) => {
-        conn.query(`DELETE Artistas FROM Artistas
-                        LEFT JOIN Canciones ON Canciones.id_artista = Artistas.id_artista
-                        LEFT JOIN Albumes ON Albumes.id_artista = Artistas.id_artista
-                        LEFT JOIN Reproducciones ON Reproducciones.id_cancion = Canciones.id_cancion
-                        LEFT JOIN Favoritos ON Favoritos.id_cancion = Canciones.id_cancion
-                        LEFT JOIN Playlist_canciones ON Playlist_canciones.id_cancion = Canciones.id_cancion
-                        WHERE Artistas.id_artista = ?`, id, ((err, result) => {
+        conn.query('DELETE FROM Artistas WHERE id_artista = ?', id, ((err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -204,14 +199,11 @@ function readCanciones() {
             } else {
                 let canciones = [];
                 for (let cancion of result) {
-                    const imagen64 = await getImagen('canciones/' + cancion.id_cancion);
-                    const mp3_64 = await getCancion(cancion.id_cancion);
                     canciones.push({
                         id: cancion.id_cancion,
-                        imagen: imagen64.image,
                         nombre: cancion.nombre,
+                        imagen: `${prefijoBucket}Fotos/canciones/${cancion.id_cancion}.jpg`,
                         duracion: cancion.duracion,
-                        mp3: mp3_64.song,
                         artista: cancion.artista
                     })
                 }
@@ -278,11 +270,7 @@ function updateCancion(id, nombre, imagen, duracion, artista, mp3) {
 
 function deleteCancion(id) {
     return new Promise((resolve, reject) => {
-        conn.query(`DELETE Canciones FROM Canciones
-                        LEFT JOIN Reproducciones ON Reproducciones.id_cancion = Canciones.id_cancion
-                        LEFT JOIN Favoritos ON Favoritos.id_cancion = Canciones.id_cancion
-                        LEFT JOIN Playlist_canciones ON Playlist_canciones.id_cancion = Canciones.id_cancion
-                        WHERE Canciones.id_cancion = ?`, id, ((err, result) => {
+        conn.query('DELETE FROM Canciones WHERE id_cancion = ?', id, ((err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -297,6 +285,35 @@ function deleteCancion(id) {
 }
 
 //========================================== CRUD ALBUMES ==========================================
+function getIdAlbum(nombre, id_artista) {
+    return new Promise((resolve, reject) => {
+        conn.query('SELECT id_album FROM Albumes WHERE nombre = ? AND id_artista = ?', [nombre, id_artista], ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.length > 0) {
+                    resolve({ status: true, id_album: result[0].id_album });
+                } else {
+                    resolve({ status: false });
+                }
+             }
+        }));
+    });
+}
+
+function createAlbum(nombre, descripcion, id_artista) {
+    return new Promise((resolve, reject) => {     
+        conn.query('INSERT INTO Albumes (nombre, descripcion, id_artista) VALUES (?, ?, ?)',
+        [nombre, descripcion, id_artista], (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ status: true, id_album: result.insertId })
+            }
+        });
+    });
+}
+
 function readAlbumes() {
     return new Promise((resolve, reject) => {
         conn.query(`SELECT alb.id_album, alb.nombre, alb.descripcion, a.nombre AS artista FROM Albumes alb
@@ -306,11 +323,10 @@ function readAlbumes() {
             } else {
                 let albumes = [];
                 for (let album of result) {
-                    const imagen64 = await getImagen('albumes/' + album.id_album);
                     albumes.push({
-                        id: album.id_cancion,
-                        imagen: imagen64.image,
+                        id: album.id_album,
                         nombre: album.nombre,
+                        imagen: `${prefijoBucket}Fotos/albumes/${album.id_album}.jpg`,
                         artista: album.artista
                     })
                 }
@@ -325,6 +341,28 @@ function buscar(palabra) {
     return new Promise((resolve, reject) => {
         conn.query('SELECT * FROM Canciones WHERE nombre LIKE %?%', palabra, (async (err, result) => {
             
+        }));
+    });
+}
+
+//============================================= PERFIL =============================================
+function getPerfil(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query('SELECT id_usuario, nombres, apellidos, correo FROM Usuarios WHERE id_usuario = ?', id_usuario, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.length > 0) {
+                    resolve({
+                        nombre: result[0].nombres,
+                        apellido: result[0].apellidos, 
+                        imagen: `${prefijoBucket}Fotos/usuarios/${result[0].id_usuario}.jpg`,
+                        email: result[0].correo 
+                    });
+                } else {
+                    reject("No existe el usuario")
+                }
+            }
         }));
     });
 }
@@ -369,11 +407,10 @@ function getFavoritos(id_usuario) {
             } else {
                 let canciones = [];
                 for (let cancion of result) {
-                    const imagen64 = await getImagen('canciones/' + cancion.id_cancion);
                     canciones.push({
                         id: cancion.id_cancion,
-                        imagen: imagen64.image,
                         nombre: cancion.nombre,
+                        imagen: `${prefijoBucket}Fotos/canciones/${cancion.id_cancion}.jpg`,
                         duracion: cancion.duracion,
                         artista: cancion.artista
                     })
@@ -401,14 +438,15 @@ function getIdPlaylist(id_usuario, nombre) {
     });
 }
 
-function createPlaylist(id_usuario, nombre, descripcion) {
+function createPlaylist(id_usuario, nombre, descripcion, imagen) {
     return new Promise((resolve, reject) => {
         descripcion = descripcion? descripcion : '';
         conn.query('INSERT INTO Playlists (nombre, descripcion, id_usuario) VALUES (?, ?, ?)', [nombre, descripcion, id_usuario], (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
-                resolve({ status: true, id_playlist: result.insertId, listado_playlists: await readPlaylists(id_usuario) });
+                guardarImagen('playlists/'+ result.insertId, imagen);
+                resolve({ status: true, listado_playlists: await readPlaylists(id_usuario) });
             }
         }));
     });
@@ -416,18 +454,17 @@ function createPlaylist(id_usuario, nombre, descripcion) {
 
 function readPlaylists(id_usuario) {
     return new Promise((resolve, reject) => {
-        conn.query(`SELECT id_playlist, nombre, descripcion, imagen FROM Playlists
+        conn.query(`SELECT id_playlist, nombre, descripcion FROM Playlists
                     WHERE id_usuario = ?`, id_usuario, (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
                 let playlists = [];
                 for (let playlist of result) {
-                    const imagen64 = await getImagen('playlists/' + playlist.id_playlists);
                     playlists.push({
                         nombre: playlist.nombre,
                         descripcion: playlist.descripcion,
-                        imagen: imagen64.image
+                        imagen: `${prefijoBucket}Fotos/playlists/${playlist.id_usuario}.jpg`
                     })
                 }
                 resolve({ 'playlist': playlists });
@@ -475,14 +512,11 @@ function readCancionesPlaylist(id_playlist) {
             } else {
                 let canciones = [];
                 for (let cancion of result) {
-                    const imagen64 = await getImagen('canciones/' + cancion.id_cancion);
-                    const mp3_64 = await getCancion(cancion.id_cancion);
                     canciones.push({
                         id: cancion.id_cancion,
-                        imagen: imagen64.image,
                         nombre: cancion.nombre,
                         duracion: cancion.duracion,
-                        mp3: mp3_64.song,
+                        imagen: `${prefijoBucket}Fotos/canciones/${cancion.id_cancio}.jpg`,
                         artista: cancion.artista
                     })
                 }
@@ -580,8 +614,11 @@ module.exports = {
     updateCancion,
     deleteCancion,
 
+    getIdAlbum,
+    createAlbum,
     readAlbumes,
 
+    getPerfil,
     buscar,
 
     favorito,

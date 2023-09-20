@@ -7,7 +7,7 @@ AWS.config.update({
     secretAccessKey: process.env.SECRET_ACCESS_KEY
 });
 
-function guardarImagen(id, img64) {
+async function guardarImagen(id, img64) {
     var nombre = `Fotos/${id}.jpg`;
     //Conversión de base64 a bytes
     let buff = new Buffer.from(img64, 'base64');
@@ -19,10 +19,10 @@ function guardarImagen(id, img64) {
         Body: buff,
         ContentType: 'image',
     }
-    s3.putObject(params).promise();
+    await s3.putObject(params).promise();
 }
 
-function guardarCancion(id, mp3_64) {
+async function guardarCancion(id, mp3_64) {
     var nombre = `Canciones/${id}.mp3`;
     //Conversión de base64 a bytes
     let buff = new Buffer.from(mp3_64, 'base64');
@@ -34,7 +34,7 @@ function guardarCancion(id, mp3_64) {
         Body: buff,
         ContentType: 'song',
     }
-    s3.putObject(params).promise();
+    await s3.putObject(params).promise();
 }
 
 function getImagen(id) {

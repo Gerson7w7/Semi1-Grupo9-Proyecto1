@@ -1,7 +1,8 @@
 var router = require('express').Router();
 
 const { getIdArtista, getNombreArtista, createArtista, readArtistas, updateArtista, deleteArtista,
-        getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion } = require('../controller/mysql');
+        getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion,
+        getIdAlbum, createAlbum } = require('../controller/mysql');
 
 const { guardarImagen, guardarCancion } = require('../controller/s3');
 
@@ -124,6 +125,27 @@ router.post('/eliminar-cancion', async (req, res) => {
     try {
         const result = await deleteCancion(id);
         res.status(200).json(result);
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ok: false})
+    }
+});
+
+router.post('/crear-album', async (req, res) => {
+    const { nombre, descripcion, imagen, artista } = req.body;
+    try {
+        const res_artista = await getIdArtista(artista);
+        if (res_artista.status) {
+            const existente = await getIdAlbum(nombre, res_artista.id_artista);
+            if (!existente.status) {
+                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
+                if (result.status) {
+                    guardarImagen('albumes/'+ result.id_album, imagen);
+                    return res.status(200).json({ok: true});
+                }   
+            }
+        }
+        res.status(400).json({ok: false})
     } catch (error) {
         console.log(error);
         res.status(400).json({ok: false})

@@ -32,7 +32,7 @@ router.post('/registro', async (req, res) => {
     const apellidos = req.body.apellidos;
     const imagen = req.body.imagen;
     const correo = req.body.correo;
-    const pass = sha256(req.body.password);
+    const password = sha256(req.body.password);
     const fecha = req.body.fecha;
 
     if (nombres === "" || apellidos === "" || correo === "" || imagen === "") {
@@ -41,7 +41,7 @@ router.post('/registro', async (req, res) => {
         try {
             const result1 = await existeUsuario(correo);
             if (!result1.status) {
-                const result = await registrarUsuario(nombres, apellidos, correo, pass, fecha);
+                const result = await registrarUsuario(nombres, apellidos, correo, password, fecha);
                 if (result.status) {
                     guardarImagen('usuarios/' + result.id_usuario, imagen);
                     return res.status(200).json({ok: true})

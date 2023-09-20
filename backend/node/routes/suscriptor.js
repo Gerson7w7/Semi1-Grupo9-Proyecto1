@@ -1,6 +1,6 @@
 var router = require('express').Router();
 const { readCanciones, readAlbumes, readArtistas,
-        buscar,
+        getPerfil, buscar,
         favorito, getFavoritos,
         getIdPlaylist, createPlaylist, readPlaylists, addCancionPlaylist, deleteCancionPlaylist, readCancionesPlaylist,
         getTopCanciones, getTopArtistas, getTopAlbums, getHistorial } = require('../controller/mysql');
@@ -15,6 +15,17 @@ router.get('/inicio', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(400).json({canciones:[]}, {albums:[]}, {artistas:[]});
+    }
+});
+
+router.post('/perfil', async(req, res) => {
+    try {
+        const id_usuario = req.body.id_usuario;
+        const perfil = await getPerfil(id_usuario);
+        res.status(200).json(perfil)
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ imagen: '', nombre: '', apellido: '', email: '' })
     }
 });
 
@@ -57,9 +68,8 @@ router.post('/playlist', async (req, res) => {
         
         const existente = await getIdPlaylist(id_usuario, nombre);
         if (!existente.status) {
-            const result = await createPlaylist(id_usuario, nombre, descripcion);
+            const result = await createPlaylist(id_usuario, nombre, descripcion, imagen);
             if (result.status) {
-                guardarImagen('playlists/'+ result.id_playlist, imagen);
                 return res.status(200).json(result.listado_playlists);
             }
         }
@@ -70,7 +80,7 @@ router.post('/playlist', async (req, res) => {
     }
 });
 
-router.post('/playlist', async (req, res) => {
+router.post('/playlists', async (req, res) => {
     try {
         const id_usuario = req.body.id_usuario;
         const result = await readPlaylists(id_usuario);
@@ -96,7 +106,6 @@ router.post('/playlist/add-song', async(req, res) => {
     }
 });
 
-
 router.post('/playlist/delete-song', async(req, res) => {
     try {
         const { id_usuario, id_cancion, nombre_playlist } = req.body;
@@ -112,7 +121,7 @@ router.post('/playlist/delete-song', async(req, res) => {
     }
 });
 
-router.post('/inplaylist/', async(req, res) => {
+router.post('/inplaylist', async(req, res) => {
     try {
         const { id_usuario, nombre } = req.body;
         const playlist = await getIdPlaylist(id_usuario, nombre);
