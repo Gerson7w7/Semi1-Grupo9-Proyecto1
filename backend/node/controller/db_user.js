@@ -1,7 +1,7 @@
 const conn = require('../database/db.js');
-const { guardarImagen } = require('../controller/s3');
-const { getImagen, getCancion } = require('../controller/s3');
-const prefijoBucket = 'https://multimedia-semi1-g9.s3.amazonaws.com/';
+const { guardarImagen } = require('./s3.js');
+const { readCancionesAlbum, readCancionesArtista } = require ('./db_admin.js');
+const prefijoBucket = process.env.PREFIJO_BUCKET;
 
 function loginUsuario(correo, password) {
     return new Promise((resolve, reject) => {
@@ -11,6 +11,23 @@ function loginUsuario(correo, password) {
             } else {
                 if (result.length > 0) {
                     resolve({ status: true, id_usuario: result[0].id_usuario });
+                } else {
+                    resolve({ status: false });
+                }
+                
+            }
+        }));
+    });
+}
+
+function passwordCorrecto(id_usuario, password) {
+    return new Promise((resolve, reject) => {
+        conn.query('SELECT password FROM Usuarios WHERE id_usuario = ? AND password = ?', [id_usuario, password], ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.length > 0) {
+                    resolve({ status: true });
                 } else {
                     resolve({ status: false });
                 }
@@ -45,155 +62,14 @@ function registrarUsuario(nombres, apellidos, correo, pass, fecha) {
     });
 }
 
-//========================================== CRUD ARTISTAS ==========================================
-function getIdArtista(nombre) {
+//============================================= BUSCAR =============================================
+function buscarCanciones(id_usuario, palabra) {
+    palabra = `%${palabra}%`;
     return new Promise((resolve, reject) => {
-        conn.query('SELECT id_artista FROM Artistas WHERE nombre = ?', nombre, ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (result.length > 0) {
-                    resolve({ status: true, id_artista: result[0].id_artista });
-                } else {
-                    resolve({ status: false });
-                }
-             }
-        }));
-    });
-}
-
-function createArtista(nombre, fecha_nacimiento) {
-    return new Promise((resolve, reject) => {
-        if (fecha_nacimiento != null && fecha_nacimiento != undefined && fecha_nacimiento != '') {
-            conn.query('INSERT INTO Artistas (nombre, fecha_nacimiento) VALUES (?, ?)',
-            [nombre, fecha_nacimiento], (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ status: true, id_artista: result.insertId })
-                }
-            });
-        } else {
-            conn.query('INSERT INTO Artistas (nombre) VALUES (?)',
-            [nombre, link_foto], (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ status: true, id_artista: result.insertId })
-                }
-            });
-        }
-    });
-}
-
-function readArtistas() {
-    return new Promise((resolve, reject) => {
-        conn.query('SELECT * FROM Artistas', (async (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                let artistas = [];
-                for (let artista of result) {
-                    try {
-                        const string_date = `${artista.fecha_nacimiento.getUTCFullYear()}/${artista.fecha_nacimiento.getUTCMonth()+1}/${artista.fecha_nacimiento.getUTCDate()}`;
-                        artistas.push({
-                            id: artista.id_artista,
-                            nombre: artista.nombre,
-                            imagen: `${prefijoBucket}Fotos/artistas/${artista.id_artista}.jpg`,
-                            nacimiento: string_date
-                        })
-                    } catch (err) {
-                        console.log(err);
-                    }
-                }
-                resolve({ 'artistas': artistas });
-            }
-        }));
-    });
-}
-
-function getNombreArtista(id){
-    return new Promise((resolve, reject) => {
-        conn.query('SELECT nombre FROM Artistas WHERE id_artista = ?', id, ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve({ ok: true });
-            }
-        }));
-    });
-}
-
-function updateArtista(id, nombre, fecha) {
-    let actualizacion = 'SET '
-    actualizacion += nombre == ''? '' : `nombre = ${nombre}`;
-
-    if (actualizacion.length > 4) {
-        actualizacion += fecha == ''? '' : `, fecha = ${fecha}`;
-    } else {
-        actualizacion += fecha == ''? '' : `fecha = ${fecha}`;
-    }
-    return new Promise((resolve, reject) => {
-        conn.query('UPDATE Artistas ? WHERE id_artista = ?', [actualizacion, id], ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve({ ok: true });
-            }
-        }));
-    });
-}
-
-function deleteArtista(id) {
-    return new Promise((resolve, reject) => {
-        conn.query('DELETE FROM Artistas WHERE id_artista = ?', id, ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (result.affectedRows > 0) {
-                    resolve({ ok: true })
-                } else {
-                    resolve({ ok: false })
-                }
-            }
-        }));
-    });
-}
-
-//========================================= CRUD CANCIONES ==========================================
-function getIdCancion(nombre, id_artista) {
-    return new Promise((resolve, reject) => {
-        conn.query('SELECT id_cancion FROM Canciones WHERE nombre = ? AND id_artista = ?', [nombre, id_artista], ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (result.length > 0) {
-                    resolve({ status: true, id_cancion: result[0].id_cancion });
-                } else {
-                    resolve({ status: false });
-                }
-             }
-        }));
-    });
-}
-
-function createCancion(nombre, duracion, id_artista) {
-    return new Promise((resolve, reject) => {     
-        conn.query('INSERT INTO Canciones (nombre, duracion, id_artista) VALUES (?, ?, ?)',
-        [nombre, duracion, id_artista], (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve({ status: true, id_cancion: result.insertId })
-            }
-        });
-    });
-}
-
-function readCanciones() {
-    return new Promise((resolve, reject) => {
-        conn.query(`SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista FROM Canciones c
-                    INNER JOIN Artistas a ON a.id_artista = c.id_artista`, (async (err, result) => {
+        conn.query(`SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista, f.id_usuario AS favorito FROM Canciones c
+                    INNER JOIN Artistas a ON a.id_artista = c.id_artista
+                    LEFT JOIN Favoritos f ON f.id_cancion = c.id_cancion
+                    WHERE c.nombre LIKE ? AND (f.id_usuario = ? OR f.id_usuario IS NULL)`, [palabra, id_usuario], (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -204,7 +80,8 @@ function readCanciones() {
                         nombre: cancion.nombre,
                         imagen: `${prefijoBucket}Fotos/canciones/${cancion.id_cancion}.jpg`,
                         duracion: cancion.duracion,
-                        artista: cancion.artista
+                        artista: cancion.artista,
+                        esFavorito: cancion.favorito? true : false
                     })
                 }
                 resolve({ 'canciones': canciones });
@@ -213,121 +90,24 @@ function readCanciones() {
     });
 }
 
-function updateCancion(id, nombre, imagen, duracion, artista, mp3) {
-    let actualizacion = 'SET '
-    actualizacion += nombre == ''? '' : `nombre = ${nombre}`;
-    if (actualizacion.length > 4) {
-        actualizacion += imagen == ''? '' : `, imagen = ${imagen}`;
-    } else {
-        actualizacion += imagen == ''? '' : `imagen = ${imagen}`;
-    }
-
-    if (actualizacion.length > 4) {
-        actualizacion += duracion == -1? '' : `, duracion = ${duracion}`;
-    } else {
-        actualizacion += duracion == -1? '' : `duracion = ${duracion}`;
-    }
-
-    if (actualizacion.length > 4) {
-        actualizacion += mp3 == ''? '' : `, mp3 = ${mp3}`;
-    } else {
-        actualizacion += mp3 == ''? '' : `mp3 = ${mp3}`;
-    }
-
-    if (artista == '') {
-        return new Promise((resolve, reject) => {
-            conn.query('UPDATE Canciones ? WHERE id_cancion = ?', [actualizacion, id], ((err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ ok: true });
-                }
-            }));
-        });
-    }
-    return new Promise((resolve, reject) => {
-        conn.query('SELECT id_artista FROM Artistas WHERE nombre = ?', artista, ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (actualizacion.length > 4) {
-                    actualizacion += artista == ''? '' : `, id_artista = ${result[0].id_artista}`;
-                } else {
-                    actualizacion += artista == ''? '' : `id_artista = ${result[0].id_artista}`;
-                }
-                conn.query('UPDATE Canciones ? WHERE id_cancion = ?', [actualizacion, id], ((err, result) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve({ ok: true });
-                    }
-                }));
-            }
-        }));
-
-    });
-}
-
-function deleteCancion(id) {
-    return new Promise((resolve, reject) => {
-        conn.query('DELETE FROM Canciones WHERE id_cancion = ?', id, ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (result.affectedRows > 0) {
-                    resolve({ ok: true })
-                } else {
-                    resolve({ ok: false })
-                }
-            }
-        }));
-    });
-}
-
-//========================================== CRUD ALBUMES ==========================================
-function getIdAlbum(nombre, id_artista) {
-    return new Promise((resolve, reject) => {
-        conn.query('SELECT id_album FROM Albumes WHERE nombre = ? AND id_artista = ?', [nombre, id_artista], ((err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (result.length > 0) {
-                    resolve({ status: true, id_album: result[0].id_album });
-                } else {
-                    resolve({ status: false });
-                }
-             }
-        }));
-    });
-}
-
-function createAlbum(nombre, descripcion, id_artista) {
-    return new Promise((resolve, reject) => {     
-        conn.query('INSERT INTO Albumes (nombre, descripcion, id_artista) VALUES (?, ?, ?)',
-        [nombre, descripcion, id_artista], (err, result) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve({ status: true, id_album: result.insertId })
-            }
-        });
-    });
-}
-
-function readAlbumes() {
+function buscarAlbumes(palabra) {
+    palabra = `%${palabra}%`;
     return new Promise((resolve, reject) => {
         conn.query(`SELECT alb.id_album, alb.nombre, alb.descripcion, a.nombre AS artista FROM Albumes alb
-                    INNER JOIN Artistas a ON a.id_artista = alb.id_artista`, (async (err, result) => {
+                    INNER JOIN Artistas a ON a.id_artista = alb.id_artista
+                    WHERE alb.nombre LIKE ?`, palabra, (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
                 let albumes = [];
                 for (let album of result) {
+                    const c = await readCancionesAlbum(album.id_album);
                     albumes.push({
                         id: album.id_album,
                         nombre: album.nombre,
                         imagen: `${prefijoBucket}Fotos/albumes/${album.id_album}.jpg`,
-                        artista: album.artista
+                        artista: album.artista,
+                        canciones: c.canciones
                     })
                 }
                 resolve({ 'albums': albumes });
@@ -336,11 +116,26 @@ function readAlbumes() {
     });
 }
 
-//============================================= BUSCAR =============================================
-function buscar(palabra) {
+function buscarArtistas(palabra) {
+    palabra = `%${palabra}%`;
     return new Promise((resolve, reject) => {
-        conn.query('SELECT * FROM Canciones WHERE nombre LIKE %?%', palabra, (async (err, result) => {
-            
+        conn.query(`SELECT id_artista, nombre FROM Artistas
+                    WHERE nombre LIKE ?`, palabra, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let artistas = [];
+                for (let artista of result) {
+                    const c = await readCancionesArtista(artista.id_artista);
+                    artistas.push({
+                        id: artista.id_artista,
+                        nombre: artista.nombre,
+                        imagen: `${prefijoBucket}Fotos/artistas/${artista.id_artista}.jpg`,
+                        canciones: c.canciones
+                    })
+                }
+                resolve({ 'artistas': artistas });
+            }
         }));
     });
 }
@@ -361,6 +156,27 @@ function getPerfil(id_usuario) {
                     });
                 } else {
                     reject("No existe el usuario")
+                }
+            }
+        }));
+    });
+}
+
+function modificarPerfil(id_usuario, nombres, apellidos, correo) {
+    return new Promise((resolve, reject) => {
+        conn.query(`UPDATE Usuarios
+                    SET nombres = CASE WHEN LENGTH(?) > 0 THEN ? ELSE nombres END,
+                    apellidos = CASE WHEN LENGTH(?) > 0 THEN ? ELSE apellidos END,
+                    correo = CASE WHEN LENGTH(?) > 0 THEN ? ELSE correo END
+                    WHERE id_usuario = ?`,
+                    [nombres, nombres, apellidos, apellidos, correo, correo, id_usuario], (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.changedRows > 0) {
+                    resolve({ ok: true })
+                } else {
+                    resolve({ ok: false })
                 }
             }
         }));
@@ -530,10 +346,11 @@ function readCancionesPlaylist(id_playlist) {
 //============================================ HISTÓRICO ============================================
 function getTopCanciones(id_usuario) {
     return new Promise((resolve, reject) => {
-        conn.query(`SELECT c.nombre, a.nombre AS artista, r.contador AS veces FROM Reproducciones r
+        conn.query(`SELECT c.nombre, a.nombre AS artista, COUNT(*) AS veces FROM Reproducciones r
                     LEFT JOIN Canciones c ON c.id_cancion = r.id_cancion
                     INNER JOIN Artistas a ON a.id_artista = c.id_artista
                     WHERE r.id_usuario = ?
+                    GROUP BY r.id_cancion
                     ORDER BY veces DESC`, id_usuario, (async (err, result) => {
             if (err) {
                 reject(err);
@@ -546,7 +363,7 @@ function getTopCanciones(id_usuario) {
 
 function getTopArtistas(id_usuario) {
     return new Promise((resolve, reject) => {
-        conn.query(`SELECT a.nombre, SUM(r.contador) AS veces FROM Reproducciones r
+        conn.query(`SELECT a.nombre, COUNT(*) AS veces FROM Reproducciones r
                     INNER JOIN Canciones c ON c.id_cancion = r.id_cancion
                     INNER JOIN Artistas a ON a.id_artista = c.id_artista
                     WHERE r.id_usuario = ?
@@ -563,12 +380,12 @@ function getTopArtistas(id_usuario) {
 
 function getTopAlbums(id_usuario) {
     return new Promise((resolve, reject) => {
-        conn.query(`SELECT alb.nombre, a.nombre AS artista, SUM(r.contador) AS veces FROM Reproducciones r
+        conn.query(`SELECT alb.nombre, a.nombre AS artista, COUNT(*) AS veces FROM Reproducciones r
                     INNER JOIN Canciones c ON c.id_cancion = r.id_cancion
                     INNER JOIN Albumes alb ON alb.id_album = c.id_album
                     INNER JOIN Artistas a ON a.id_artista = alb.id_artista
                     WHERE r.id_usuario = ?
-                    GROUP BY alb.nombre
+                    GROUP BY alb.nombre, artista
                     ORDER BY veces DESC`, id_usuario, (async (err, result) => {
             if (err) {
                 reject(err);
@@ -583,14 +400,92 @@ function getHistorial(id_usuario) {
     return new Promise((resolve, reject) => {
         conn.query(`SELECT c.nombre, a.nombre AS artista, c.duracion FROM Reproducciones r
                     INNER JOIN Canciones c ON c.id_cancion = r.id_cancion
-                    INNER JOIN Artistas a ON a.id_artista = alb.id_artista
+                    INNER JOIN Artistas a ON a.id_artista = c.id_artista
                     WHERE r.id_usuario = ?
-                    GROUP BY alb.nombre
-                    ORDER BY r.orden DESC`, id_usuario, (async (err, result) => {
+                    ORDER BY r.id_reproduccion DESC`, id_usuario, (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
                 resolve({ 'canciones': result });
+            }
+        }));
+    });
+}
+
+//========================================== REPRODUCCIÓN ==========================================
+function reproducirAlbum(id_usuario, id_album) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT id_cancion, nombre FROM Canciones c
+                    WHERE id_album = ?`, id_album, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let canciones = [];
+                for (let cancion of result) {
+                    canciones.push({
+                        nombre: cancion.nombre,
+                        url: `${prefijoBucket}Canciones/${cancion.id_cancion}.mp3`
+                    })
+                    conn.query(`INSERT INTO Reproducciones (id_usuario, id_cancion)
+                        VALUES(?, ?)`, [id_usuario, cancion.id_cancion], ((err, result) => {
+                        if (err) {
+                            reject(err);
+                        }
+                    }));
+                }
+                resolve({ 'tracks': canciones });
+            }
+        }));
+    });
+}
+
+function reproducirArtista(id_usuario, id_artista) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT id_cancion, nombre FROM Canciones c
+                    WHERE id_artista = ?`, id_artista, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let canciones = [];
+                for (let cancion of result) {
+                    canciones.push({
+                        nombre: cancion.nombre,
+                        url: `${prefijoBucket}Canciones/${cancion.id_cancion}.mp3`,
+                    })
+                    conn.query(`INSERT INTO Reproducciones (id_usuario, id_cancion)
+                        VALUES(?, ?)`, [id_usuario, cancion.id_cancion], ((err, result) => {
+                        if (err) {
+                            reject(err);
+                        }
+                    }));
+                }
+                resolve({ 'tracks': canciones });
+            }
+        }));
+    });
+}
+
+function reproducirAleatorio(id_usuario) {
+    return new Promise((resolve, reject) => {
+        conn.query(`SELECT id_cancion, nombre FROM Canciones c
+                    ORDER BY RAND()`, (async (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                let canciones = [];
+                for (let cancion of result) {
+                    canciones.push({
+                        nombre: cancion.nombre,
+                        url: `${prefijoBucket}Canciones/${cancion.id_cancion}.mp3`,
+                    })
+                    conn.query(`INSERT INTO Reproducciones (id_usuario, id_cancion)
+                        VALUES(?, ?)`, [id_usuario, cancion.id_cancion], ((err, result) => {
+                        if (err) {
+                            reject(err);
+                        }
+                    }));
+                }
+                resolve({ 'tracks': canciones });
             }
         }));
     });
@@ -601,25 +496,10 @@ module.exports = {
     existeUsuario,
     registrarUsuario,
 
-    getIdArtista,
-    getNombreArtista,
-    createArtista,
-    readArtistas,
-    updateArtista,
-    deleteArtista,
-
-    getIdCancion,
-    createCancion,
-    readCanciones,
-    updateCancion,
-    deleteCancion,
-
-    getIdAlbum,
-    createAlbum,
-    readAlbumes,
-
     getPerfil,
-    buscar,
+    passwordCorrecto,
+    modificarPerfil,
+    buscarCanciones,
 
     favorito,
     getFavoritos,
@@ -634,5 +514,13 @@ module.exports = {
     getTopCanciones,
     getTopArtistas,
     getTopAlbums,
-    getHistorial
+    getHistorial,
+
+    buscarCanciones,
+    buscarAlbumes,
+    buscarArtistas,
+
+    reproducirAlbum,
+    reproducirArtista,
+    reproducirAleatorio
 }

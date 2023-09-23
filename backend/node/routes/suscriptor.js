@@ -1,9 +1,12 @@
 var router = require('express').Router();
-const { readCanciones, readAlbumes, readArtistas,
-        getPerfil, buscar,
+const sha256 = require('js-sha256');
+const { readCanciones, readAlbumes, readArtistas, getIdArtistaCancion } = require('../controller/db_admin')
+const { getPerfil, passwordCorrecto, modificarPerfil, buscarCanciones, buscarAlbumes, buscarArtistas,
         favorito, getFavoritos,
         getIdPlaylist, createPlaylist, readPlaylists, addCancionPlaylist, deleteCancionPlaylist, readCancionesPlaylist,
-        getTopCanciones, getTopArtistas, getTopAlbums, getHistorial } = require('../controller/mysql');
+        getTopCanciones, getTopArtistas, getTopAlbums, getHistorial,
+        reproducirAlbum, reproducirArtista, reproducirAleatorio } = require('../controller/db_user');
+const { guardarImagen } = require('../controller/s3');
 
 router.get('/inicio', async (req, res) => {
     try {
@@ -18,7 +21,7 @@ router.get('/inicio', async (req, res) => {
     }
 });
 
-router.post('/perfil', async(req, res) => {
+router.post('/perfil', async (req, res) => {
     try {
         const id_usuario = req.body.id_usuario;
         const perfil = await getPerfil(id_usuario);
@@ -29,11 +32,33 @@ router.post('/perfil', async(req, res) => {
     }
 });
 
+router.post('/modificar-perfil', async (req, res) => {
+    try {
+        const { id_usuario, imagen, nombre, apellido, email, password } = req.body;
+        const correcto = await passwordCorrecto(id_usuario, sha256(password));
+        if (correcto.status) {
+            const result = await modificarPerfil(id_usuario, nombre, apellido, email);
+            if (imagen != "") {
+                guardarImagen('usuarios/' + id_usuario, imagen);
+                result.ok = true;
+            }
+            return res.status(200).json(result);
+        }
+        res.status(400).json({ ok : false });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ ok : false });
+    }
+});
+
 router.post('/buscar', async (req, res) => {
     try {
-        const palabra = req.body.buscar;
-        const result = await buscar(palabra);
-        res.status(200).json(result);
+        const { id_usuario, buscar } = req.body;
+        const c = await buscarCanciones(id_usuario, buscar);
+        const alb = await buscarAlbumes(buscar);
+        const art = await buscarArtistas(buscar);
+
+        res.status(200).json({ canciones: c.canciones, albums: alb.albums, artistas: art.artistas });
     } catch (error) {
         console.log(error);
         res.status(400).json({ ok: false });
@@ -148,6 +173,41 @@ router.post('/historial', async(req, res) => {
     } catch (error) {
         console.log(error);
         res.status(400).json({ cancionesRep: [], artistaRep: [], albumRep: [], historial: [] })
+    }
+});
+
+router.post('/reproducir', async (req, res) => {
+    const { id, tipo, id_usuario } = req.body;
+    try {
+        if (tipo == 0) {//Canciones
+            const resultArtista = await getIdArtistaCancion(id);
+            if (resultArtista.status) {
+                const result = await reproducirArtista(id_usuario, resultArtista.id_artista);
+                return res.status(200).json(result);
+            }
+        } else if (tipo == 1) {//Album
+            const result = await reproducirAlbum(id_usuario, id);
+            return res.status(200).json(result);
+        } else if (tipo == 2) {//Artista
+            const result = await reproducirArtista(id_usuario, id);
+            return res.status(200).json(result);
+        }
+        res.status(400).json({ tracks: [] });
+    } catch {
+        console.log(error);
+        res.status(400).json({ tracks: [] });
+    }
+
+});
+
+router.post('/reproducir-aleatorio', async (req, res) => {
+    try {
+        const id_usuario = req.body.id_usuario;
+        const result = await reproducirAleatorio(id_usuario);
+        res.status(200).json(result);
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ tracks: [] });
     }
 });
 

@@ -1,0 +1,12 @@
+HOST=localhost
+PORT=3306
+USER=user1
+PASSWORD=proyecto_semi
+DATABASE=db_semi1_p1
+
+REGION=us-east-1
+ACCESS_KEY_ID=AKIAULIXOKZQ7I5ISCEC
+SECRET_ACCESS_KEY=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
+
+BUCKET=multimedia-semi1-g9
+PREFIJO_BUCKET=https://multimedia-semi1-g9.s3.amazonaws.com/

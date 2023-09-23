@@ -1,9 +1,8 @@
 var router = require('express').Router();
 
-const { getIdArtista, getNombreArtista, createArtista, readArtistas, updateArtista, deleteArtista,
+const { getIdArtista, createArtista, readArtistas, updateArtista, deleteArtista,
         getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion,
-        getIdAlbum, createAlbum } = require('../controller/mysql');
-
+        getIdAlbum, createAlbum, readCancionesAlbum  } = require('../controller/db_admin');
 const { guardarImagen, guardarCancion } = require('../controller/s3');
 
 router.post('/crear-artista', async (req, res) => {
@@ -37,15 +36,11 @@ router.get('/get-artistas', async (req, res) => {
 router.post('/actualizar-artista', async (req, res) => {
     let { id, nombre, imagen, fecha } = req.body;
     try {
-        nombre = nombre? nombre : '';
-        if (imagen) {
-            const nombre_original = await getNombreArtista(id);
-            guardarImagen('artistas/'+ nombre_original, imagen);
-        } else {
-            imagen = ''
-        }
-        fecha = fecha? fecha : '';
         const result = await updateArtista(id, nombre, fecha);
+        if (imagen != '') {
+            guardarImagen('artistas/'+ id, imagen);
+            result.ok = true;
+        }
         res.status(200).json(result);
     } catch (error) {
         console.log(error);
@@ -97,22 +92,30 @@ router.get('/get-canciones', async (req, res) => {
 });
 
 router.post('/actualizar-cancion', async (req, res) => {
-    const { id, nombre, imagen, duracion, artista, mp3 } = req.body;
+    let { id, nombre, imagen, duracion, artista, mp3 } = req.body;
     try {
-        nombre = nombre? nombre : '';
-        if (imagen) {
-            //guardar imagen en S3 y obtener link, guardar en imagen
-        } else {
-            imagen = ''
+        if (duracion == "") {
+            duracion = 0;
         }
-        duracion = duracion? duracion: -1;
-        artista = artista? artista: '';
-        if (mp3) {
-            //guardar cancion en S3 y obtener link, guardar en cmp3
-        } else {
-            mp3 = ''
+        let id_artista = 0;
+        if (artista != "") {
+            const resultadoArtista = await getIdArtista(artista);
+            if (resultadoArtista.status) {
+                id_artista = resultadoArtista.id_artista;
+            } else {
+                return res.status(200).json(result);
+            }
+            
         }
-        const result = await updateCancion(id, nombre, imagen, duracion, artista, mp3);
+        const result = await updateCancion(id, nombre, duracion, id_artista);
+        if (imagen != '') {
+            guardarImagen('canciones/'+ id, imagen);
+            result.ok = true;
+        }
+        if (mp3 != '') {
+            guardarCancion(id, imagen);
+            result.ok = true;
+        }
         res.status(200).json(result);
     } catch (error) {
         console.log(error);
@@ -149,6 +152,105 @@ router.post('/crear-album', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(400).json({ok: false})
+    }
+});
+
+router.post('/delete-album', async (req, res) => {
+    const id_album = req.body.id;
+    try {
+        /*const res_artista = await getIdArtista(artista);
+        if (res_artista.status) {
+            const existente = await getIdAlbum(nombre, res_artista.id_artista);
+            if (!existente.status) {
+                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
+                if (result.status) {
+                    guardarImagen('albumes/'+ result.id_album, imagen);
+                    return res.status(200).json({ok: true});
+                }   
+            }
+        }*/
+        res.status(400).json({ok: false})
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ok: false})
+    }
+});
+
+router.post('/album', async (req, res) => {
+    try {
+        const nombre = req.body;
+        const id_album = await getIdAlbum(nombre);
+        if (id_album.status) {
+            const result = await readCancionesAlbum(id_album);
+            return res.status(200).json({ songs: result.canciones });
+        }
+        res.status(400).json({ songs: [] });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ ok: false });
+    }
+});
+
+router.get('/album', async (req, res) => {
+    try {
+        /*
+        const res_artista = await getIdArtista(artista);
+        if (res_artista.status) {
+            const existente = await getIdAlbum(nombre, res_artista.id_artista);
+            if (!existente.status) {
+                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
+                if (result.status) {
+                    guardarImagen('albumes/'+ result.id_album, imagen);
+                    return res.status(200).json({ok: true});
+                }   
+            }
+        }*/
+        res.status(400).json({album: []})
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({album: []})
+    }
+});
+
+router.post('/add-song-album', async (req, res) => {
+    const { id_cancion, nombre_album } = req.body;
+    try {
+        /*const res_artista = await getIdArtista(artista);
+        if (res_artista.status) {
+            const existente = await getIdAlbum(nombre, res_artista.id_artista);
+            if (!existente.status) {
+                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
+                if (result.status) {
+                    guardarImagen('albumes/'+ result.id_album, imagen);
+                    return res.status(200).json({ok: true});
+                }   
+            }
+        }*/
+        res.status(400).json({songs: []})
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({songs: []})
+    }
+});
+
+router.post('/delete-song-album', async (req, res) => {
+    const { id_cancion, nombre_album } = req.body;
+    try {
+        /*const res_artista = await getIdArtista(artista);
+        if (res_artista.status) {
+            const existente = await getIdAlbum(nombre, res_artista.id_artista);
+            if (!existente.status) {
+                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
+                if (result.status) {
+                    guardarImagen('albumes/'+ result.id_album, imagen);
+                    return res.status(200).json({ok: true});
+                }   
+            }
+        }*/
+        res.status(400).json({songs: []})
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({songs: []})
     }
 });
 

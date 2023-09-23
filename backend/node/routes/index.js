@@ -1,9 +1,8 @@
 const sha256 = require('js-sha256');
 const router = require('express').Router();
 
-const { loginUsuario, registrarUsuario, existeUsuario } = require('../controller/mysql')
+const { loginUsuario, registrarUsuario, existeUsuario } = require('../controller/db_user')
 const { guardarImagen } = require('../controller/s3');
-
 
 router.get('/', (req, res) => {
     res.status(200).json({"message": "API corriendo"});
