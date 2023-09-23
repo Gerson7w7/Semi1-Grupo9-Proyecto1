@@ -41,7 +41,7 @@ const AudioPlayer = (props) => {
       </button>
       <div className="centered-audio-container">
         <audio id="audio-player" controls>
-          <source src={audioTracks} type="audio/mp3" />
+          <source src={audioTracks[currentTrackIndex]} type="audio/mp3" />
         </audio>
       </div>
       <button className="next-button" onClick={handlePlayNext}>
