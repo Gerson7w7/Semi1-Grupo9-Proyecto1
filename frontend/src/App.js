@@ -9,6 +9,8 @@ import PaginaPrincipal from "./pages/PaginaPrincipal";
 import Login from "./pages/Login";
 import Buscar from "./pages/Buscar";
 import Historico from "./pages/Historico";
+import Album from "./pages/Album";
+import InAlbum from "./pages/inAlbum";
 import Artista from "./pages/Artista";
 import Cancion from "./pages/Cancion";
 import Perfil from "./pages/Perfil";
@@ -32,6 +34,8 @@ function App() {
           <Route path="/historico" element={<Historico />} />
           <Route path="/artista" element={<Artista />} />
           <Route path="/cancion" element={<Cancion />} />
+          <Route path="/album" element={<Album />} />
+          <Route path="/inalbum" element={<InAlbum />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/playlist" element={<Playlist />} />
           <Route path="/inplaylist" element={<InPlaylist />} />

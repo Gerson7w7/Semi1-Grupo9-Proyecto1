@@ -223,7 +223,7 @@ const Playlist = () => {
           </div>
         </div>
       </div>
-        <AudioPlayer />
+        
     </main>
   );
 };
