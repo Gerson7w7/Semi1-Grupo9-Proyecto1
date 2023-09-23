@@ -20,10 +20,17 @@ const Playlist = () => {
   const [imagenBase64, setImagenBase64] = useState(""); // Almacenará la imagen en formato base64
   const ip = "localhost";
   
-  useEffect(() => {
-    // Hacer una solicitud GET a la API para obtener las playlists
-    const url = `http://${ip}:5000/playlist`;
-    fetch(url)
+  const obtenerPlaylists = () => {
+    // Hacer una solicitud POST a la API para obtener las playlists
+    const id_usuario = localStorage.getItem("id_usuario");
+    const url = `http://${ip}:5000/playlists`;
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id_usuario }),
+    })
       .then((response) => response.json())
       .then((data) => {
         // Actualizar el estado de las playlists con los datos recibidos
@@ -32,7 +39,7 @@ const Playlist = () => {
       .catch((error) => {
         console.error("Error al obtener las playlists:", error);
       });
-  }, []);
+  };
 
   const toggleFormulario = () => {
     setMostrarFormulario(!mostrarFormulario);
