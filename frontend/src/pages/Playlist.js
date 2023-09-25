@@ -23,6 +23,7 @@ const Playlist = () => {
   const obtenerPlaylists = () => {
     // Hacer una solicitud POST a la API para obtener las playlists
     const id_usuario = localStorage.getItem("id_usuario");
+    console.log("Valor de id_usuario:", id_usuario);
     const url = `http://${ip}:5000/playlists`;
     fetch(url, {
       method: "POST",
@@ -40,6 +41,10 @@ const Playlist = () => {
         console.error("Error al obtener las playlists:", error);
       });
   };
+
+  useEffect(() => {
+    obtenerPlaylists();
+  });
 
   const toggleFormulario = () => {
     setMostrarFormulario(!mostrarFormulario);
@@ -59,7 +64,9 @@ const Playlist = () => {
     }
 
     // Crear un objeto de playlist con los datos ingresados
+    const id_usuario = localStorage.getItem("id_usuario");
     const nuevaPlaylist = {
+      id: id_usuario,
       nombre: nombrePlaylist,
       descripcion: descripcionPlaylist,
       imagenBase64: imagenBase64,

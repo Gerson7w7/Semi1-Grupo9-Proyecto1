@@ -31,9 +31,10 @@ function RegistroUsuario() {
     const usuario = {
       nombres,
       apellidos,
-      imagen: foto, // Aquí podrías enviar la imagen en base64, si estás seguro de que no es demasiado grande
+      imagen: foto,
       correo: email,
       password,
+      fechaNacimiento
     };
   
     // Realizar la solicitud POST al servidor
@@ -96,7 +97,7 @@ function RegistroUsuario() {
             src={foto}
             alt="Foto de Perfil"
           />
-          <button className="add-button" onClick={handleAgregarImagenClick}>
+          <button class="add-button" onClick={handleAgregarImagenClick}>
             +
           </button>
           <input
