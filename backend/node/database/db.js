@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 let db_credentials = {
   host: process.env.HOST,
   port: process.env.PORT,
-  user: process.env.USER,
+  user: 'admin',
   password: process.env.PASSWORD,
   database: process.env.DATABASE,
 }

@@ -2,7 +2,7 @@ var router = require('express').Router();
 
 const { getIdArtista, createArtista, readArtistas, updateArtista, deleteArtista,
         getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion,
-        getIdAlbum, createAlbum, readCancionesAlbum  } = require('../controller/db_admin');
+        getIdAlbum, createAlbum, deleteAlbum, readCancionesAlbum, addCancionAlbum, deleteCancionAlbum  } = require('../controller/db_admin');
 const { guardarImagen, guardarCancion } = require('../controller/s3');
 
 router.post('/crear-artista', async (req, res) => {
@@ -158,18 +158,8 @@ router.post('/crear-album', async (req, res) => {
 router.post('/delete-album', async (req, res) => {
     const id_album = req.body.id;
     try {
-        /*const res_artista = await getIdArtista(artista);
-        if (res_artista.status) {
-            const existente = await getIdAlbum(nombre, res_artista.id_artista);
-            if (!existente.status) {
-                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
-                if (result.status) {
-                    guardarImagen('albumes/'+ result.id_album, imagen);
-                    return res.status(200).json({ok: true});
-                }   
-            }
-        }*/
-        res.status(400).json({ok: false})
+        const result = await deleteAlbum(id_album);
+        res.status(200).json(result)
     } catch (error) {
         console.log(error);
         res.status(400).json({ok: false})
@@ -191,41 +181,35 @@ router.post('/album', async (req, res) => {
     }
 });
 
-router.get('/album', async (req, res) => {
+router.get('/album/:nombre', async (req, res) => {
     try {
-        /*
-        const res_artista = await getIdArtista(artista);
-        if (res_artista.status) {
-            const existente = await getIdAlbum(nombre, res_artista.id_artista);
-            if (!existente.status) {
-                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
-                if (result.status) {
-                    guardarImagen('albumes/'+ result.id_album, imagen);
-                    return res.status(200).json({ok: true});
-                }   
-            }
-        }*/
-        res.status(400).json({album: []})
+        const nombre_album = req.params.nombre;
+        const album = await getIdAlbum(nombre_album);
+        if (album.status) {
+            const result = await readCancionesAlbum(album.id_album);
+            return res.status(200).json({ songs: result.canciones });
+        }
+        res.status(200).json({songs: []})
     } catch (error) {
         console.log(error);
-        res.status(400).json({album: []})
+        res.status(400).json({songs: []})
     }
 });
 
 router.post('/add-song-album', async (req, res) => {
-    const { id_cancion, nombre_album } = req.body;
+    const { id_cancion, nombre_album, artista } = req.body;
     try {
-        /*const res_artista = await getIdArtista(artista);
+        const res_artista = await getIdArtista(artista);
         if (res_artista.status) {
-            const existente = await getIdAlbum(nombre, res_artista.id_artista);
-            if (!existente.status) {
-                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
+            const album = await getIdAlbum(nombre_album, res_artista.id_artista);
+            if (!album.status) {
+                const result = await addCancionAlbum(id_cancion, album.id_album);
                 if (result.status) {
-                    guardarImagen('albumes/'+ result.id_album, imagen);
-                    return res.status(200).json({ok: true});
+                    const c = await readCancionesAlbum(album.id_album);
+                    return res.status(200).json({songs: c.canciones});
                 }   
             }
-        }*/
+        }
         res.status(400).json({songs: []})
     } catch (error) {
         console.log(error);
@@ -234,19 +218,19 @@ router.post('/add-song-album', async (req, res) => {
 });
 
 router.post('/delete-song-album', async (req, res) => {
-    const { id_cancion, nombre_album } = req.body;
+    const { id_cancion, nombre_album, artista } = req.body;
     try {
-        /*const res_artista = await getIdArtista(artista);
+        const res_artista = await getIdArtista(artista);
         if (res_artista.status) {
-            const existente = await getIdAlbum(nombre, res_artista.id_artista);
-            if (!existente.status) {
-                const result = await createAlbum(nombre, descripcion, res_artista.id_artista);
+            const album = await getIdAlbum(nombre, res_artista.id_artista);
+            if (!album.status) {
+                const result = await deleteCancionAlbum(id_cancion, album.id_album);
                 if (result.status) {
-                    guardarImagen('albumes/'+ result.id_album, imagen);
-                    return res.status(200).json({ok: true});
+                    const c = await readCancionesAlbum(album.id_album);
+                    return res.status(200).json({songs: c.canciones});
                 }   
             }
-        }*/
+        }
         res.status(400).json({songs: []})
     } catch (error) {
         console.log(error);
