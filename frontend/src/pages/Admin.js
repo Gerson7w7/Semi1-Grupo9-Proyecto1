@@ -49,7 +49,7 @@ const Admin = () => {
           </div>
         </div>
       </div>
-      <AudioPlayer />
+      <AudioPlayer audioTracks={[]}/>
     </main>
   );
 };

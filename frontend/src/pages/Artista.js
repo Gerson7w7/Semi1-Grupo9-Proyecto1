@@ -25,7 +25,7 @@ const Artista = () => {
             });
         };
         fetchData();
-      }, [artistas]);
+      }, []);
 
   const crearArtista = () => {
     const reader = new FileReader();
@@ -374,7 +374,7 @@ const Artista = () => {
           </div>
         </div>
       </div>
-      <AudioPlayer />
+      <AudioPlayer audioTracks={[]}/>
     </main>
   );
 };
