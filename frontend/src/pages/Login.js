@@ -9,7 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [rememberme, setRememberme] = useState(false);
   const [showError, setShowError] = useState(false);
-  const ip = 'localhost'
+  const ip = 'http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/'
 
   const inicioSesion = (event) => {
     event.preventDefault();
@@ -28,7 +28,7 @@ const Login = () => {
     } else {
       console.log("USER");
       let inicioExitoso = false;
-      const url = `http://${ip}:5000/login`;
+      const url = `${ip}/login`;
       let data = { email: email, password: password, rememberme: rememberme };
       const fetchData = async () => {
         fetch(url, {

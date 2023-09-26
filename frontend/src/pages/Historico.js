@@ -9,10 +9,10 @@ const Historico = () => {
   const [albumRep, setAlbumRep] = useState([]);
   const [artistaRep, setArtistaRep] = useState([]);
   const [historial, setHistorial] = useState([]);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
-    const url = `http://${ip}:5000/historial`;
+    const url = `${ip}/historial`;
 
     const fetchData = async () => {
       let data = { id_usuario: localStorage.getItem("id_usuario")};

@@ -10,10 +10,10 @@ const Artista = () => {
   const [password, setPassword] = useState("");
   const [artistas, setArtistas] = useState([]);
   const [showError, setShowError] = useState(false);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
     useEffect(() => {
-        const url = `http://${ip}:5000/get-artistas`;
+        const url = `${ip}/get-artistas`;
 
         const fetchData = async () => {
           fetch(url)
@@ -31,7 +31,7 @@ const Artista = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
-      const url = `http://${ip}:5000/crear-artista`;
+      const url = `${ip}/crear-artista`;
       const data = {
         nombre: nombre,
         imagen: base64Image, // Aquí está la imagen en formato base64
@@ -58,7 +58,7 @@ const Artista = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
-      const url = `http://${ip}:5000/actualizar-artista`;
+      const url = `${ip}/actualizar-artista`;
       const data = {
         id: id,
         nombre: nombre,
@@ -84,7 +84,7 @@ const Artista = () => {
 
   const eliminarArtista = (id) => {
     if (password === "123") {
-      const url = `http://${ip}:5000/eliminar-artista`;
+      const url = `${ip}/eliminar-artista`;
       const fetchData = async () => {
         let data = { id: id };
         fetch(url, {

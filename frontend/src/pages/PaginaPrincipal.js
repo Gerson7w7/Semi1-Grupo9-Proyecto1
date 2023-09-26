@@ -9,10 +9,10 @@ const PaginaPrincipal = () => {
   const [albums, setAlbums] = useState([]);
   const [artistas, setArtistas] = useState([]);
   const [tracks, setTracks] = useState([]);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
-    const url = `http://${ip}:5000/inicio`;
+    const url = `${ip}/inicio`;
 
     const fetchData = async () => {
       fetch(url)
@@ -32,7 +32,7 @@ const PaginaPrincipal = () => {
     // 0 = canción
     // 1 = album
     // 2 = artista
-    const url = `http://${ip}:5000/reproducir`;
+    const url = `${ip}/reproducir`;
       let data = { id: id, tipo: tipo};
       const fetchData = async () => {
         fetch(url, {

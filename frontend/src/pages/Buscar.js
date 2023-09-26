@@ -11,10 +11,10 @@ const Buscar = () => {
   const [artistas, setArtistas] = useState([]);
   const [buscar, setBuscar] = useState('');
   const [tracks, setTracks] = useState([]);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   const buscarFn = () => {
-    const url = `http://${ip}:5000/buscar`;
+    const url = `${ip}/buscar`;
     const fetchData = async () => {
       let data = { buscar: buscar };
       fetch(url, {
@@ -45,7 +45,7 @@ const Buscar = () => {
     favs[index] = !favs[index];
     setFavoritos(favs); // se actualiza los favoritos
 
-    const url = `http://${ip}:5000/favorito`;
+    const url = `${ip}/favorito`;
     const fetchData = async () => {
       let data = { fav: id, id_usuario: localStorage.getItem("id_usuario")};
       fetch(url, {
@@ -66,7 +66,7 @@ const Buscar = () => {
     // 0 = canción
     // 1 = album
     // 2 = artista
-    const url = `http://${ip}:5000/reproducir`;
+    const url = `${ip}/reproducir`;
       let data = { id: id, tipo: tipo};
       const fetchData = async () => {
         fetch(url, {
