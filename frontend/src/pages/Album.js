@@ -6,13 +6,6 @@ import { Link } from "react-router-dom";
 const Album = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [albums, setAlbums] = useState([
-    {
-      idalbum: 1,
-      nombre: "Mi Album 15",
-      descripcion: "Descripción de mi Album",
-      imagen: "URL_de_la_imagen",
-      artista: "artista",
-    },
   ]);
   const [nombreAlbum, setNombreAlbum] = useState("");
   const [descripcionAlbum, setDescripcionAlbum] = useState("");
@@ -30,6 +23,7 @@ const Album = () => {
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
+        console.log("infaaao", data)
         // Actualizar el estado de los albums con los datos recibidos
         setAlbums(data);
       })
@@ -59,12 +53,12 @@ const Album = () => {
     const nuevoAlbum = {
       nombre: nombreAlbum,
       descripcion: descripcionAlbum,
-      imagenBase64: imagenBase64,
+      imagen: imagenBase64,
       artista: nombreArtista,
     };
-
+    console.log("sdasd", nuevoAlbum)
     // Enviar los datos al servidor mediante una solicitud POST
-    const url = `${ip}album`;
+    const url = `${ip}crear-album`;
     fetch(url, {
       method: "POST",
       headers: {
@@ -74,15 +68,12 @@ const Album = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("infooooo", data)
         // Actualizar el estado de los albums con el nuevo album creado
-        setAlbums(data);
 
-        // Cerrar el formulario y limpiar los campos
-        setMostrarFormulario(false);
-        setNombreAlbum("");
-        setDescripcionAlbum("");
-        setImagenAlbum(null);
-        setImagenBase64("");
+        // Cerrar el formulario y limpiar los campos// Recargar la página actual
+        window.location.reload();
+
       })
       .catch((error) => {
         console.error("Error al crear el Album:", error);
