@@ -33,16 +33,18 @@ const Cancion = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
+      const parts = base64Image.split(",");
       const reader2 = new FileReader();
       reader2.onload = (event) => {
         const base64Mp3 = event.target.result;
+        const parts2 = base64Mp3.split(",");
         const url = `${ip}/crear-cancion`;
         const data = {
           nombre: nombre,
-          imagen: base64Image, // Aquí está la imagen en formato base64
+          imagen: parts[1], // Aquí está la imagen en formato base64
           duracion: duracion,
           artista: artista,
-          mp3: base64Mp3,
+          mp3: parts2[1],
         };
 
         fetch(url, {
@@ -67,17 +69,19 @@ const Cancion = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
+      const parts = base64Image.split(",");
       const reader2 = new FileReader();
       reader2.onload = (event) => {
         const base64Mp3 = event.target.result;
+        const parts2 = base64Mp3.split(",");
         const url = `${ip}/actualizar-cancion`;
         const data = {
           id: id,
           nombre: nombre,
-          imagen: base64Image, // Aquí está la imagen en formato base64
+          imagen: parts[1], // Aquí está la imagen en formato base64
           duracion: duracion,
           artista: artista,
-          mp3: base64Mp3,
+          mp3: parts2[1],
         };
 
         fetch(url, {

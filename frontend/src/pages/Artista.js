@@ -31,10 +31,11 @@ const Artista = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
+      const parts = base64Image.split(",");
       const url = `${ip}/crear-artista`;
       const data = {
         nombre: nombre,
-        imagen: base64Image, // Aquí está la imagen en formato base64
+        imagen: parts[1], // Aquí está la imagen en formato base64
         fecha: fecha,
       };
 
@@ -58,11 +59,12 @@ const Artista = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
+      const parts = base64Image.split(",");
       const url = `${ip}/actualizar-artista`;
       const data = {
         id: id,
         nombre: nombre,
-        imagen: base64Image, // Aquí está la imagen en formato base64
+        imagen: parts[1], // Aquí está la imagen en formato base64
         fecha: fecha,
       };
 
