@@ -351,7 +351,8 @@ function getTopCanciones(id_usuario) {
                     INNER JOIN Artistas a ON a.id_artista = c.id_artista
                     WHERE r.id_usuario = ?
                     GROUP BY r.id_cancion
-                    ORDER BY veces DESC`, id_usuario, (async (err, result) => {
+                    ORDER BY veces DESC
+                    LIMIT 5`, id_usuario, (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -368,7 +369,8 @@ function getTopArtistas(id_usuario) {
                     INNER JOIN Artistas a ON a.id_artista = c.id_artista
                     WHERE r.id_usuario = ?
                     GROUP BY a.nombre
-                    ORDER BY veces DESC`, id_usuario, (async (err, result) => {
+                    ORDER BY veces DESC
+                    LIMIT 3`, id_usuario, (async (err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -386,7 +388,8 @@ function getTopAlbums(id_usuario) {
                     INNER JOIN Artistas a ON a.id_artista = alb.id_artista
                     WHERE r.id_usuario = ?
                     GROUP BY alb.nombre, artista
-                    ORDER BY veces DESC`, id_usuario, (async (err, result) => {
+                    ORDER BY veces DESC
+                    LIMIT 5`, id_usuario, (async (err, result) => {
             if (err) {
                 reject(err);
             } else {

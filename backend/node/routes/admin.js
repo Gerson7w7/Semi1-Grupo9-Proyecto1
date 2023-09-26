@@ -2,7 +2,7 @@ var router = require('express').Router();
 
 const { getIdArtista, createArtista, readArtistas, updateArtista, deleteArtista,
         getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion,
-        getIdAlbum, createAlbum, deleteAlbum, readCancionesAlbum, addCancionAlbum, deleteCancionAlbum  } = require('../controller/db_admin');
+        getIdAlbum, createAlbum, deleteAlbum, readCancionesAlbum, addCancionAlbum, deleteCancionAlbum, readAlbumes  } = require('../controller/db_admin');
 const { guardarImagen, guardarCancion } = require('../controller/s3');
 
 router.post('/crear-artista', async (req, res) => {
@@ -166,15 +166,10 @@ router.post('/delete-album', async (req, res) => {
     }
 });
 
-router.post('/album', async (req, res) => {
+router.get('/album', async (req, res) => {
     try {
-        const nombre = req.body;
-        const id_album = await getIdAlbum(nombre);
-        if (id_album.status) {
-            const result = await readCancionesAlbum(id_album);
-            return res.status(200).json({ songs: result.canciones });
-        }
-        res.status(400).json({ songs: [] });
+        const result = await readAlbumes();
+        return res.status(200).json({ album: result.albums });
     } catch (error) {
         console.log(error);
         res.status(400).json({ ok: false });
@@ -183,7 +178,8 @@ router.post('/album', async (req, res) => {
 
 router.get('/album/:nombre', async (req, res) => {
     try {
-        const nombre_album = req.params.nombre;
+        const nombre_album = (req.params.nombre).replaceAll('%20', ' ');
+        console.log(nombre_album)
         const album = await getIdAlbum(nombre_album);
         if (album.status) {
             const result = await readCancionesAlbum(album.id_album);
