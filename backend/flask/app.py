@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
+
 from routes.index import auth_routes #Importar rutas
 from routes.admin import admin_routes
 from routes.suscriptor import suscriptor_routes
@@ -16,9 +17,14 @@ app.register_blueprint(admin_routes, url_prefix='/')
 # Registra las rutas de suscriptor utilizando app
 app.register_blueprint(suscriptor_routes, url_prefix='/')
 
+# Define una ruta GET en la raíz ("/pong")
+@app.route('/pong', methods=['GET'])
+def pong():
+    return jsonify(message="Estamos listos")
+
 if __name__ == '__main__':
     # Ejecuta la aplicación Flask en el puerto 2000 (o el puerto que desees)
-    app.run(port=2001, debug=True)
+    app.run(port=2000, debug=False)
 
 '''
 pip install Flask

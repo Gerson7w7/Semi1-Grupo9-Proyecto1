@@ -7,6 +7,8 @@ from controller.s3 import guardarImagen, guardarCancion
 
 admin_routes = Blueprint('admin_routes', __name__)
 
+
+
 @admin_routes.route('/crear-artista', methods=['POST'])
 def crear_artista():
     try:
