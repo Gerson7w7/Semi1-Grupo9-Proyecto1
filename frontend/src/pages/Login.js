@@ -42,19 +42,20 @@ const Login = () => {
           .catch((error) => console.error("Error:", error))
           .then((res) => {
             console.log("res: ", res);
-            inicioExitoso = res.exito; // true o false
+            inicioExitoso = res.ok; // true o false
             localStorage.setItem("id_usuario", res.id_usuario);
+            if (inicioExitoso) {
+              navigate("/inicio");
+              localStorage.setItem("isAdmin", 0);
+            } else {
+              console.log("ERROR");
+              setShowError(true);
+            }
           });
       };
       fetchData();
 
-      if (inicioExitoso) {
-        navigate("/inicio");
-        localStorage.setItem("isAdmin", 0);
-      } else {
-        console.log("ERROR");
-        setShowError(true);
-      }
+      
     }
   };
 
