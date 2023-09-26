@@ -24,7 +24,8 @@ def pong():
 
 if __name__ == '__main__':
     # Ejecuta la aplicación Flask en el puerto 2000 (o el puerto que desees)
-    app.run(port=2000, debug=False)
+    app.run(host='0.0.0.0', port=2000, debug=False)
+
 
 '''
 pip install Flask
