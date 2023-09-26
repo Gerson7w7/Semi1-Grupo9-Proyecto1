@@ -24,7 +24,9 @@ const Playlist = () => {
     // Hacer una solicitud POST a la API para obtener las playlists
     const id_usuario = localStorage.getItem("id_usuario");
     console.log("Valor de id_usuario:", id_usuario);
+
     const url = `${ip}playlists`;
+
     fetch(url, {
       method: "POST",
       headers: {
@@ -73,7 +75,9 @@ const Playlist = () => {
     };
 
     // Enviar los datos al servidor mediante una solicitud POST
+
     const url = `${ip}playlist`;
+
     fetch(url, {
       method: "POST",
       headers: {

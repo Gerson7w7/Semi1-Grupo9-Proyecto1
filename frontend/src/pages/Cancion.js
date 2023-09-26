@@ -12,10 +12,10 @@ const Cancion = () => {
   const [password, setPassword] = useState("");
   const [canciones, setCanciones] = useState([]);
   const [showError, setShowError] = useState(false);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
-    const url = `http://${ip}:5000/get-canciones`;
+    const url = `${ip}/get-canciones`;
 
     const fetchData = async () => {
       fetch(url)
@@ -36,7 +36,7 @@ const Cancion = () => {
       const reader2 = new FileReader();
       reader2.onload = (event) => {
         const base64Mp3 = event.target.result;
-        const url = `http://${ip}:5000/crear-cancion`;
+        const url = `${ip}/crear-cancion`;
         const data = {
           nombre: nombre,
           imagen: base64Image, // Aquí está la imagen en formato base64
@@ -70,7 +70,7 @@ const Cancion = () => {
       const reader2 = new FileReader();
       reader2.onload = (event) => {
         const base64Mp3 = event.target.result;
-        const url = `http://${ip}:5000/actualizar-cancion`;
+        const url = `${ip}/actualizar-cancion`;
         const data = {
           id: id,
           nombre: nombre,
@@ -100,7 +100,7 @@ const Cancion = () => {
 
   const eliminarCancion = (id) => {
     if (password === "123") {
-      const url = `http://${ip}:5000/eliminar-cancion`;
+      const url = `${ip}/eliminar-cancion`;
       const fetchData = async () => {
         let data = { id: id };
         fetch(url, {
