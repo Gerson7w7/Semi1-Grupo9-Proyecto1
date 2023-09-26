@@ -288,6 +288,7 @@ function readAlbumes() {
                     albumes.push({
                         id: album.id_album,
                         nombre: album.nombre,
+                        descripcion: album.descripcion,
                         imagen: `${prefijoBucket}Fotos/albumes/${album.id_album}.jpg`,
                         artista: album.artista
                     })
@@ -322,6 +323,22 @@ function readCancionesAlbum(id_album) {
     });
 }
 
+function deleteAlbum(id_album) {
+    return new Promise((resolve, reject) => {
+        conn.query('DELETE FROM Albumes WHERE id_cancion = ?', id, ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.affectedRows > 0) {
+                    resolve({ ok: true })
+                } else {
+                    resolve({ ok: false })
+                }
+            }
+        }));
+    });
+}
+
 module.exports = {
     getIdArtista,
     getIdArtistaCancion,
@@ -340,6 +357,7 @@ module.exports = {
     getIdAlbum,
     createAlbum,
     readAlbumes,
+    deleteAlbum,
     readCancionesAlbum,
     readCancionesArtista
 }

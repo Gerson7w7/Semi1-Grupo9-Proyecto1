@@ -23,7 +23,9 @@ CREATE TABLE Canciones (
     FOREIGN KEY (id_artista)
         REFERENCES Artistas(id_artista)
         ON DELETE CASCADE,
-    FOREIGN KEY (id_album) REFERENCES Albumes(id_album)
+    FOREIGN KEY (id_album)
+        REFERENCES Albumes(id_album)
+        ON DELETE SET NULL
 );
 
 CREATE TABLE Usuarios (
