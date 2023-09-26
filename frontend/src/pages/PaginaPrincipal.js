@@ -33,7 +33,8 @@ const PaginaPrincipal = () => {
     // 1 = album
     // 2 = artista
     const url = `${ip}/reproducir`;
-      let data = { id: id, tipo: tipo};
+      let data = { id: id, tipo: tipo, id_usuario : localStorage.getItem("id_usuario")};
+      console.log("envio0",data)
       const fetchData = async () => {
         fetch(url, {
           method: "POST",
@@ -45,6 +46,7 @@ const PaginaPrincipal = () => {
           .then((res) => res.json())
           .catch((error) => console.error("Error:", error))
           .then((res) => {
+            console.log("regreso", res)
             const tracksAux = res.tracks
             let tracksL = []
             for (const t of tracksAux) {

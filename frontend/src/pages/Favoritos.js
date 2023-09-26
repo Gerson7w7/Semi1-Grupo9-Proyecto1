@@ -9,8 +9,7 @@ const Favoritos = () => {
   const [favoriteSongs, setFavoriteSongs] = useState([]);
   const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
-  useEffect(() => {
-    // Obtén el ID del usuario desde localStorage
+  const recargar = () => {
     const id_usuario = localStorage.getItem("id_usuario");
 
     // Crea un objeto con el ID de usuario
@@ -37,6 +36,31 @@ const Favoritos = () => {
       .catch((error) => {
         console.error("Error al obtener las canciones favoritas:", error);
       });
+  }
+
+  const unfavorito = (id) => {
+
+    const url = `${ip}/favorito`;
+    const fetchData = async () => {
+      let data = { fav: id, id_usuario: localStorage.getItem("id_usuario")};
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((res) => {
+          recargar()
+        });
+    };
+    fetchData();
+  };
+  useEffect(() => {
+    // Obtén el ID del usuario desde localStorage
+    recargar()
   }, []); // El array de dependencias vacío asegura que esta solicitud solo se realice una vez al montar el componente
 
 
@@ -67,13 +91,9 @@ const Favoritos = () => {
                         <button
                           type="button"
                           class={`btn btn-sm ${
-                            song.isFavorite ? "btn-success" : "btn-secondary"
+                            "btn-success" 
                           } favorite-button`}
-                          onClick={() => {
-                            // Aquí puedes implementar la lógica para cambiar el estado de favorito
-                            // Puedes realizar una solicitud al servidor para marcar o desmarcar como favorito
-                            // Actualizar el estado en el frontend, etc.
-                            // Ejemplo: toggleFavorite(song.id);
+                          onClick={() => {unfavorito(song.id)
                           }}
                         >
                           <img
