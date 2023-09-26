@@ -6,9 +6,11 @@ from controller.s3 import getImagen, getCancion  # Importa las funciones de s3
 try:
     conn = mysql.connector.connect(**config)
     if conn.is_connected():
+        print("conectado")
         cursor = conn.cursor()
 
         def loginUsuario(correo, password):
+            print("login acceso")
             try:
                 cursor.execute('SELECT id_usuario FROM Usuarios WHERE correo = %s AND password = %s', (correo, password))
                 result = cursor.fetchall()
