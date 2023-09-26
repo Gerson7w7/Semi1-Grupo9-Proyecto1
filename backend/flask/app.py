@@ -18,7 +18,7 @@ app.register_blueprint(admin_routes, url_prefix='/')
 app.register_blueprint(suscriptor_routes, url_prefix='/')
 
 # Define una ruta GET en la raíz ("/pong")
-@app.route('/pong', methods=['GET'])
+@app.route('/', methods=['GET'])
 def pong():
     return jsonify(message="Estamos listos")
 
