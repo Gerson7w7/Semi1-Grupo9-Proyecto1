@@ -76,11 +76,40 @@ const InPlaylist = () => {
     const query = e.target.value;
     setSearchQuery(query);
 
-    // Filtrar las canciones que coinciden con la búsqueda
+    // Filtrar las canciones que coinciden con la búsqueda en tiempo real
     const filteredSongs = songs.filter((song) =>
       song.title.toLowerCase().includes(query.toLowerCase())
     );
+
+    // Actualizar los resultados de búsqueda
     setSearchResults(filteredSongs);
+  };
+
+  const handleSearch = () => {
+    const id_usuario = localStorage.getItem("id_usuario");
+
+    const data = {
+      id_usuario: id_usuario,
+      buscar: searchQuery,
+    };
+
+    const url = `${ip}buscar`;
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    };
+
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        setSongs(data.canciones);
+      })
+      .catch((error) => {
+        console.error("Error al buscar canciones:", error);
+      });
   };
 
   const handleAddToPlaylist = (songId) => {
@@ -226,11 +255,14 @@ const InPlaylist = () => {
               value={searchQuery}
               onChange={handleSearchInputChange}
             />
+            <button className="btn btn-primary" onClick={handleSearch}>
+              Buscar canciones
+            </button>
           </div>
         )}
 
         {/* Mostrar resultados de búsqueda */}
-        {searchQuery && searchResults.length > 0 && (
+        {searchResults.length > 0 && (
           <div className="mb-3">
             <table className="table table-hover">
               <tbody>
@@ -238,15 +270,15 @@ const InPlaylist = () => {
                   <tr key={song.id}>
                     <th scope="row" className="align-middle">
                       <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
+                        src={song.imagen} // Usa la imagen recibida en el JSON
                         alt=""
                         width="100"
                         height="60"
                       />
                     </th>
-                    <td className="align-middle">{song.title}</td>
-                    <td className="align-middle">{song.artist}</td>
-                    <td className="align-middle">{song.duration}</td>
+                    <td className="align-middle">{song.nombre}</td>
+                    <td className="align-middle">{song.artista}</td>
+                    <td className="align-middle">{song.duracion}</td>
                     <td className="text-end align-middle">
                       <button
                         type="button"
