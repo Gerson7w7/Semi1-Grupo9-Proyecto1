@@ -1,43 +1,45 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "../assets/styles/Perfil.css"; // Importa el archivo CSS
 import Navegacion from "../components/Navegacion";
-import logo from "../logo.svg";
 
 function Perfil() {
-  const [nombre, setNombre] = useState("JohnXD");
-  const [apellido, setApellido] = useState("Doe");
-  const [fotoPerfil, setFotoPerfil] = useState(logo);
-  const [correoElectronico, setCorreoElectronico] =
-    useState("john@example.com");
-  const [contrasena, setContrasena] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [fotoPerfil, setFotoPerfil] = useState(null);
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
   const [modoEdicion, setModoEdicion] = useState(false);
   const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
   const fileInputRef = useRef(null);
   console.log("PERFIL");
   let inicioExitoso = false;
-  const url = `${ip}perfil`;
-  let data = {
-    nombre: nombre,
-    apellido: apellido,
-    contrasena: contrasena,
-    correoElectronico: correoElectronico,
-  };
-  const fetchData = async () => {
-    fetch(url, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .catch((error) => console.error("Error:", error))
-      .then((res) => {
-        console.log("res: ", res);
-        inicioExitoso = res.exito; // true o false
-      });
-  };
-  //fetchData();
+  const url1 = `${ip}modificar-perfil`;
+  const id_usuario = localStorage.getItem("id_usuario");
+
+  useEffect(() => {
+    if (id_usuario) {
+      const url = `${ip}perfil`;
+      const data = { id_usuario };
+
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.imagen) {
+            setFotoPerfil(res.imagen);
+          }
+          setNombre(res.nombre);
+          setApellido(res.apellido);
+          setemail(res.email);
+        })
+        .catch((error) => console.error("Error:", error));
+    }
+  }, []);
 
   const handleModificarDatosClick = () => {
     setModoEdicion(true);
@@ -45,10 +47,33 @@ function Perfil() {
 
   const handleGuardarDatosClick = () => {
     // Aquí puedes implementar la lógica para guardar los datos y verificar la contraseña.
-    const contrasenaCorrecta = true; // Cambia esto según tu lógica de autenticación.
+    const passwordCorrecta = true; // Cambia esto según tu lógica de autenticación.
 
-    if (contrasenaCorrecta) {
+    if (passwordCorrecta) {
+
       setModoEdicion(false);
+      const data = {
+        id_usuario,
+        nombre,
+        apellido,
+        email,
+        password,
+        imagen: Base64Modificada(fotoPerfil), // Agrega la imagen en formato base64
+      };
+
+      fetch(url1, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((res) => {
+          console.log("res: ", res);
+          inicioExitoso = res.exito; // true o false
+        });
     } else {
       alert("Contraseña incorrecta. No se guardaron los datos.");
     }
@@ -57,8 +82,6 @@ function Perfil() {
   const handleFileInputChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // Aquí puedes procesar el archivo seleccionado (por ejemplo, cargarlo y mostrarlo como imagen de perfil).
-
       const fileReader = new FileReader();
       fileReader.onload = () => {
         setFotoPerfil(fileReader.result);
@@ -68,13 +91,21 @@ function Perfil() {
   };
 
   const handleAgregarImagenClick = () => {
-    // Abre el explorador de archivos cuando el usuario hace clic en el botón.
     fileInputRef.current.click();
   };
 
+  function Base64Modificada(base64String) {
+    const parts = base64String.split(",");
+    if (parts.length === 2) {
+      return parts[1];
+    } else {
+      return base64String; // Devuelve la cadena original si no se encuentra una coma
+    }
+  }
+
   return (
     <main>
-      <div class="contenido album py-5 ">
+      <div className="contenido album py-5 ">
         <Navegacion />
         <div className="contenedor ">
           <h1>Perfil de Usuario</h1>
@@ -124,8 +155,8 @@ function Perfil() {
                   <input
                     className="input-field"
                     type="email"
-                    value={correoElectronico}
-                    onChange={(e) => setCorreoElectronico(e.target.value)}
+                    value={email}
+                    onChange={(e) => setemail(e.target.value)}
                   />
                 </div>
                 <div className="editable-field">
@@ -133,8 +164,8 @@ function Perfil() {
                   <input
                     className="input-field"
                     type="password"
-                    value={contrasena}
-                    onChange={(e) => setContrasena(e.target.value)}
+                    value={password}
+                    onChange={(e) => setpassword(e.target.value)}
                   />
                 </div>
                 <button className="button" onClick={handleGuardarDatosClick}>
@@ -162,7 +193,7 @@ function Perfil() {
                 </div>
                 <div className="user-info-row">
                   <label>Correo Electrónico:</label>
-                  <span>{correoElectronico}</span>
+                  <span>{email}</span>
                 </div>
               </div>
               <button className="button" onClick={handleModificarDatosClick}>
