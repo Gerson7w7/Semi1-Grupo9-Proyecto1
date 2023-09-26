@@ -323,9 +323,42 @@ function readCancionesAlbum(id_album) {
     });
 }
 
+function addCancionAlbum(id_cancion, id_album) {
+    return new Promise((resolve, reject) => {
+        conn.query('UPDATE Canciones SET id_album = ? WHERE id_cancion = ?', [id_album, id_cancion], ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.changedRows > 0) {
+                    resolve({ status: true })
+                } else {
+                    resolve({ status: false })
+                }
+            }
+        }));
+    });
+}
+
+function deleteCancionAlbum(id_cancion, id_album) {
+    return new Promise((resolve, reject) => {
+        //Bastaría con comparar el id_cancion pero por seguridad de que no se elimine una canción de otro album
+        conn.query('UPDATE Canciones SET id_album = NULL WHERE id_cancion = ? AND id_album = ?', [id_cancion, id_album], ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.changedRows > 0) {
+                    resolve({ status: true })
+                } else {
+                    resolve({ status: false })
+                }
+            }
+        }));
+    });
+}
+
 function deleteAlbum(id_album) {
     return new Promise((resolve, reject) => {
-        conn.query('DELETE FROM Albumes WHERE id_cancion = ?', id, ((err, result) => {
+        conn.query('DELETE FROM Albumes WHERE id_cancion = ?', id_album, ((err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -359,5 +392,7 @@ module.exports = {
     readAlbumes,
     deleteAlbum,
     readCancionesAlbum,
-    readCancionesArtista
+    readCancionesArtista,
+    addCancionAlbum,
+    deleteCancionAlbum
 }
