@@ -12,10 +12,10 @@ const Cancion = () => {
   const [password, setPassword] = useState("");
   const [canciones, setCanciones] = useState([]);
   const [showError, setShowError] = useState(false);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
-    const url = `http://${ip}:5000/get-canciones`;
+    const url = `${ip}/get-canciones`;
 
     const fetchData = async () => {
       fetch(url)
@@ -27,24 +27,26 @@ const Cancion = () => {
         });
     };
     fetchData();
-  }, [canciones]);
+  }, []);
 
   const crearCancion = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
+      const parts = base64Image.split(",");
       const reader2 = new FileReader();
       reader2.onload = (event) => {
         const base64Mp3 = event.target.result;
-        const url = `http://${ip}:5000/crear-cancion`;
+        const parts2 = base64Mp3.split(",");
+        const url = `${ip}/crear-cancion`;
         const data = {
           nombre: nombre,
-          imagen: base64Image, // Aquí está la imagen en formato base64
+          imagen: parts[1], // Aquí está la imagen en formato base64
           duracion: duracion,
           artista: artista,
-          mp3: base64Mp3,
+          mp3: parts2[1],
         };
-
+        console.log('data', data);
         fetch(url, {
           method: "POST",
           body: JSON.stringify(data),
@@ -67,17 +69,19 @@ const Cancion = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
+      const parts = base64Image.split(",");
       const reader2 = new FileReader();
       reader2.onload = (event) => {
         const base64Mp3 = event.target.result;
-        const url = `http://${ip}:5000/actualizar-cancion`;
+        const parts2 = base64Mp3.split(",");
+        const url = `${ip}/actualizar-cancion`;
         const data = {
           id: id,
           nombre: nombre,
-          imagen: base64Image, // Aquí está la imagen en formato base64
+          imagen: parts[1], // Aquí está la imagen en formato base64
           duracion: duracion,
           artista: artista,
-          mp3: base64Mp3,
+          mp3: parts2[1],
         };
 
         fetch(url, {
@@ -100,7 +104,7 @@ const Cancion = () => {
 
   const eliminarCancion = (id) => {
     if (password === "123") {
-      const url = `http://${ip}:5000/eliminar-cancion`;
+      const url = `${ip}/eliminar-cancion`;
       const fetchData = async () => {
         let data = { id: id };
         fetch(url, {
@@ -303,7 +307,7 @@ const Cancion = () => {
                                     class="form-control"
                                     type="file"
                                     id="formFile"
-                                    onClick={(event) =>
+                                    onChange={(event) =>
                                       setImagen(event.target.files[0])
                                     }
                                   />
@@ -462,7 +466,7 @@ const Cancion = () => {
           </div>
         </div>
       </div>
-      <AudioPlayer />
+      <AudioPlayer audioTracks={[]}/>
     </main>
   );
 };

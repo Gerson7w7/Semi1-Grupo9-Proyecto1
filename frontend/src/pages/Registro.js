@@ -31,14 +31,15 @@ function RegistroUsuario() {
     const usuario = {
       nombres,
       apellidos,
-      imagen: foto,
+      imagen: Base64Modificada(foto),
       correo: email,
       password,
-      fechaNacimiento
+      fecha : fechaNacimiento
     };
+    console.log(usuario)
   
     // Realizar la solicitud POST al servidor
-    fetch("http://localhost:5000/registro", {
+    fetch("http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/registro", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +58,7 @@ function RegistroUsuario() {
       .catch((error) => {
         console.error("Error al registrar usuario:", error);
       });
-    window.location.href = "http://localhost:3000/inicio";
+    //window.location.href = "http://localhost:3000/inicio";
     setShowError(false);
   };
 
@@ -75,16 +76,24 @@ function RegistroUsuario() {
   const handleFileInputChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // Aquí puedes procesar el archivo seleccionado (por ejemplo, cargarlo y mostrarlo como imagen de perfil).
-
       const fileReader = new FileReader();
       fileReader.onload = () => {
-        setFoto(fileReader.result);
+        const base64Image = fileReader.result; // Aquí está la imagen en formato base64
+        setFoto(base64Image);
       };
       fileReader.readAsDataURL(selectedFile);
     }
   };
+  
 
+  function Base64Modificada(base64String) {
+    const parts = base64String.split(",");
+    if (parts.length === 2) {
+      return parts[1];
+    } else {
+      return base64String; // Devuelve la cadena original si no se encuentra una coma
+    }
+  }
   return (
     <div className="mainlogin">
       {showError && mostrarError()}

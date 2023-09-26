@@ -81,11 +81,25 @@ A continuación se presenta el diagrama entidad relación de la base de datos de
 
 # Capturas y descripción de cómo se configuró cada servicio
 
-## EC2 Node
+## EC2 
 
-## EC2 Python
+<img src="imgs/EC21.png" alt="bucket">
+<br>
+<img src="imgs/EC22.png" alt="bucket">
+<br>
+<img src="imgs/EC23.png" alt="bucket">
+<br>
+<img src="imgs/EC24.png" alt="bucket">
+<br>
 
 ## Bucket
+
+<img src="imgs/bucket1.jpg" alt="bucket">
+<br>
+<img src="imgs/bucket1.jpg" alt="bucket">
+<br>
+<img src="imgs/bucket1.jpg" alt="bucket">
+<br>
 
 ## RDS
 

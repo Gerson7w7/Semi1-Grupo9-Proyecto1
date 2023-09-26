@@ -10,10 +10,10 @@ const Artista = () => {
   const [password, setPassword] = useState("");
   const [artistas, setArtistas] = useState([]);
   const [showError, setShowError] = useState(false);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
     useEffect(() => {
-        const url = `http://${ip}:5000/get-artistas`;
+        const url = `${ip}/get-artistas`;
 
         const fetchData = async () => {
           fetch(url)
@@ -25,16 +25,18 @@ const Artista = () => {
             });
         };
         fetchData();
-      }, [artistas]);
+      }, []);
 
   const crearArtista = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64Image = event.target.result;
-      const url = `http://${ip}:5000/crear-artista`;
+      const parts = base64Image.split(",");
+      const url = `${ip}/crear-artista`;
+      console.log(parts[1])
       const data = {
         nombre: nombre,
-        imagen: base64Image, // Aquí está la imagen en formato base64
+        imagen: parts[1], // Aquí está la imagen en formato base64
         fecha: fecha,
       };
 
@@ -56,16 +58,19 @@ const Artista = () => {
 
   const actualizarArtista = (id) => {
     const reader = new FileReader();
+    console.log("imagen", imagen)
     reader.onload = (event) => {
+      console.log("enviando", "dentro")
       const base64Image = event.target.result;
-      const url = `http://${ip}:5000/actualizar-artista`;
+      const parts = base64Image.split(",");
+      const url = `${ip}/actualizar-artista`;
       const data = {
         id: id,
         nombre: nombre,
-        imagen: base64Image, // Aquí está la imagen en formato base64
+        imagen: parts[1], // Aquí está la imagen en formato base64
         fecha: fecha,
       };
-
+      console.log("enviando", data)
       fetch(url, {
         method: "POST",
         body: JSON.stringify(data),
@@ -84,7 +89,7 @@ const Artista = () => {
 
   const eliminarArtista = (id) => {
     if (password === "123") {
-      const url = `http://${ip}:5000/eliminar-artista`;
+      const url = `${ip}/eliminar-artista`;
       const fetchData = async () => {
         let data = { id: id };
         fetch(url, {
@@ -254,7 +259,7 @@ const Artista = () => {
                                     class="form-control"
                                     type="file"
                                     id="formFile"
-                                    onClick={(event) =>
+                                    onChange={(event) =>
                                       setImagen(event.target.files[0])
                                     }
                                   />
@@ -374,7 +379,7 @@ const Artista = () => {
           </div>
         </div>
       </div>
-      <AudioPlayer />
+      <AudioPlayer audioTracks={[]}/>
     </main>
   );
 };

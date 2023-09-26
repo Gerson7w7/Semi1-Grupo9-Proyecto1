@@ -31,19 +31,16 @@ const InPlaylist = () => {
     // Agrega más canciones aquí
   ]);*/
 
+  const [idDelete, setIdDelete] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchForm, setShowSearchForm] = useState(false); // Controla si se muestra el formulario de búsqueda
   const [songs, setSongs] = useState([]); // Inicialmente, el arreglo de canciones está vacío
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const nombrePlaylistParam = searchParams.get("nombrePlaylist");
-    const decodedNombrePlaylist = decodeURIComponent(nombrePlaylistParam);
-    const encode = encodeURI(decodedNombrePlaylist);
 
-    const url = `http://${ip}:5000/inplaylist/${encode}`;
+    const url = `${ip}inplaylist`;
     console.log(url);
 
     // Obtén el ID de usuario del localStorage
@@ -52,9 +49,10 @@ const InPlaylist = () => {
     // Crea un objeto con los datos que deseas enviar en el cuerpo de la solicitud POST
     const data1 = {
       id_usuario: id_usuario,
-      nombrePlaylist: nombrePlaylist,
-    };
+      nombre: nombrePlaylist,
 
+    };
+    console.log("lamadafukingdata", data1)
     fetch(url, {
       method: "POST",
       headers: {
@@ -64,8 +62,9 @@ const InPlaylist = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("lamadafukingplaylist", data)
         // Actualiza el estado con los datos de las canciones obtenidas
-        setSongs(data);
+        setSongs(data.songs);
       })
       .catch((error) => {
         console.error("Error al obtener las canciones:", error);
@@ -75,17 +74,47 @@ const InPlaylist = () => {
   const handleSearchInputChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-
-    // Filtrar las canciones que coinciden con la búsqueda
+  
+    // Filtrar las canciones que coinciden con la búsqueda en tiempo real
     const filteredSongs = songs.filter((song) =>
       song.title.toLowerCase().includes(query.toLowerCase())
     );
+  
+    // Actualizar los resultados de búsqueda
     setSearchResults(filteredSongs);
   };
+  
+  const handleSearch = () => {
+    const id_usuario = localStorage.getItem("id_usuario");
+
+    const data = {
+      id_usuario: id_usuario,
+      buscar: searchQuery,
+    };
+  
+    const url = `${ip}buscar`; 
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data), 
+    };
+  
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        
+        setSearchResults(data.canciones);
+      })
+      .catch((error) => {
+        console.error("Error al buscar canciones:", error);
+      });
+  };
+  
 
   const handleAddToPlaylist = (songId) => {
     // Encuentra la canción seleccionada por su ID
-    const selectedSong = songs.find((song) => song.id === songId);
 
     // Obtén el ID del usuario desde localStorage
     const id_usuario = localStorage.getItem("id_usuario");
@@ -93,12 +122,12 @@ const InPlaylist = () => {
     // Crea un objeto con los datos necesarios para agregar la canción
     const data = {
       id_usuario,
-      id_cancion: selectedSong.id,
+      id_cancion: songId,
       nombre_playlist: nombrePlaylist, // Asegúrate de que esta variable esté definida en tu componente
     };
 
     // Realizar una solicitud POST al backend para agregar la canción
-    const url = `http://${ip}:5000/playlist/add-song`; // URL del endpoint del servidor para agregar canciones
+    const url = `${ip}playlist/add-song`; // URL del endpoint del servidor para agregar canciones
     const requestOptions = {
       method: "POST",
       headers: {
@@ -120,8 +149,9 @@ const InPlaylist = () => {
         }
       })
       .then((updatedSongs) => {
+        console.log("aver", updatedSongs)
         // Actualiza el estado con las canciones actualizadas
-        setSongs(updatedSongs);
+        setSongs(updatedSongs.songs);
 
         // Limpia el campo de búsqueda y los resultados
         setSearchQuery("");
@@ -135,9 +165,10 @@ const InPlaylist = () => {
       });
   };
 
-  const handleDeleteClick = (songId) => {
+  const handleDeleteClick = (songId, title) => {
     setSongToDelete(songId); // Guarda el ID de la canción a eliminar
     setShowConfirmation(true);
+    setIdDelete(songId);
   };
 
   const handleCancelClick = () => {
@@ -145,23 +176,25 @@ const InPlaylist = () => {
     setSongToDelete(null); // Restablece el valor de songToDelete
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = (id_cancion) => {
     if (songToDelete !== null) {
-      // Obtén el ID del usuario desde localStorage
+      // Obtén el ID del usuario desde localSt
+      const searchParams = new URLSearchParams(location.search);
+      const nombrePlaylistParam = searchParams.get("nombrePlaylist");
       const id_usuario = localStorage.getItem("id_usuario");
 
       // Obtén el ID de la canción a eliminar y el nombre de la playlist
-      const { id, nombrePlaylist } = songToDelete;
 
       // Crea un objeto con los datos necesarios para eliminar la canción
       const data = {
-        id_usuario,
-        id_cancion: id,
-        nombre_playlist: nombrePlaylist,
+        id_usuario : parseInt(id_usuario),
+        id_cancion,
+        nombre_playlist: nombrePlaylistParam,
       };
+      console.log("ladata", data)
 
       // Realizar la solicitud POST al backend para eliminar la canción
-      const url = `http://${ip}:5000/playlist/delete-song`; // URL del endpoint del servidor para eliminar canciones
+      const url = `${ip}playlist/delete-song`; // URL del endpoint del servidor para eliminar canciones
       const requestOptions = {
         method: "POST",
         headers: {
@@ -184,9 +217,10 @@ const InPlaylist = () => {
         })
         .then((data) => {
           // Asigna el nuevo arreglo de canciones a songs
-          setSongs(data);
-          setSongToDelete(null); // Limpia el valor de songToDelete
-          setShowConfirmation(false);
+          // Recargar la página actual
+          window.location.reload();
+
+          
         })
         .catch((error) => {
           console.error("Error en la solicitud:", error);
@@ -226,9 +260,16 @@ const InPlaylist = () => {
               value={searchQuery}
               onChange={handleSearchInputChange}
             />
+            <button
+          className="btn btn-primary"
+          onClick={handleSearch}
+        >
+          Buscar canciones
+        </button>
           </div>
+          
         )}
-
+        
         {/* Mostrar resultados de búsqueda */}
         {searchQuery && searchResults.length > 0 && (
           <div className="mb-3">
@@ -238,15 +279,15 @@ const InPlaylist = () => {
                   <tr key={song.id}>
                     <th scope="row" className="align-middle">
                       <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
+                        src={song.imagen} // Usa la imagen recibida en el JSON
                         alt=""
                         width="100"
                         height="60"
                       />
                     </th>
-                    <td className="align-middle">{song.title}</td>
-                    <td className="align-middle">{song.artist}</td>
-                    <td className="align-middle">{song.duration}</td>
+                    <td className="align-middle">{song.nombre}</td>
+                    <td className="align-middle">{song.artista}</td>
+                    <td className="align-middle">{song.duracion}</td>
                     <td className="text-end align-middle">
                       <button
                         type="button"
@@ -277,9 +318,9 @@ const InPlaylist = () => {
                         height="60"
                       />
                     </th>
-                    <td className="align-middle">{song.title}</td>
-                    <td className="align-middle">{song.artist}</td>
-                    <td className="align-middle">{song.duration}</td>
+                    <td className="align-middle">{song.nombre}</td>
+                    <td className="align-middle">{song.artista}</td>
+                    <td className="align-middle">{song.duracion}</td>
                     <td className="text-end align-middle">
                       <div className="btn-group">
                         {/* Botón original */}
@@ -295,7 +336,7 @@ const InPlaylist = () => {
                         <button
                           type="button"
                           className="btn btn-sm btn-danger"
-                          onClick={() => handleDeleteClick(song.id)}
+                          onClick={() => handleDeleteClick(song.id, song.nombre)}
                         >
                           Eliminar canción
                         </button>
@@ -313,7 +354,7 @@ const InPlaylist = () => {
           <div className="modal-content">
             <div className="centered-modal">
               <p>¿Estás seguro de eliminar esta canción?</p>
-              <button className="btn btn-danger" onClick={handleConfirmDelete}>
+              <button className="btn btn-danger" onClick={handleConfirmDelete(idDelete)}>
                 Aceptar
               </button>
               <button className="btn btn-secondary" onClick={handleCancelClick}>

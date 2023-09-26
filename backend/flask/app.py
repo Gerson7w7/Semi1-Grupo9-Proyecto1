@@ -18,13 +18,14 @@ app.register_blueprint(admin_routes, url_prefix='/')
 app.register_blueprint(suscriptor_routes, url_prefix='/')
 
 # Define una ruta GET en la raíz ("/pong")
-@app.route('/pong', methods=['GET'])
+@app.route('/', methods=['GET'])
 def pong():
     return jsonify(message="Estamos listos")
 
 if __name__ == '__main__':
     # Ejecuta la aplicación Flask en el puerto 2000 (o el puerto que desees)
-    app.run(port=2000, debug=False)
+    app.run(host='0.0.0.0', port=2000, debug=False)
+
 
 '''
 pip install Flask

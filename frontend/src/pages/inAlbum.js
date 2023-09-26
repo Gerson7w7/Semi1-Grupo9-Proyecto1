@@ -35,10 +35,10 @@ const InAlbum = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchForm, setShowSearchForm] = useState(false); // Controla si se muestra el formulario de búsqueda
   const [songs, setSongs] = useState([]); // Inicialmente, el arreglo de canciones está vacío
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
-    const url = `http://${ip}:5000/album`;
+    const url = `${ip}album`;
     // Realizar una solicitud GET al servidor para obtener las canciones de la album
     
     const searchParams = new URLSearchParams(location.search);
@@ -73,7 +73,7 @@ const InAlbum = () => {
     const selectedSong = songs.find((song) => song.id === songId);
   
     // Realizar una solicitud POST al backend para agregar la canción
-    const url = `http://${ip}:5000/add-song-album`; // URL del endpoint del servidor para agregar canciones
+    const url = `${ip}add-song-album`; // URL del endpoint del servidor para agregar canciones
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -119,7 +119,7 @@ const InAlbum = () => {
   const handleConfirmDelete = () => {
     if (songToDelete !== null) {
       // Realizar la solicitud POST al backend para eliminar la canción
-      const url = `http://${ip}:5000/delete-song-album`; // URL del endpoint del servidor para eliminar canciones
+      const url = `${ip}delete-song-album`; // URL del endpoint del servidor para eliminar canciones
       const requestOptions = {
         method: 'POST',
         headers: {

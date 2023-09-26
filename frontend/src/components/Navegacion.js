@@ -182,7 +182,22 @@ const Navegacion = () => {
                 Radio
               </Link>
             </li>
-            {isAdmin && adminPanel()}
+            {isAdmin && adminPanel()}            
+            <li>
+              <Link
+                to="/login"
+                className={`nav-link ${activeLink === "radio" ? "active" : ""}`}
+              >
+                <img
+                  class="bi pe-none me-2"
+                  src="https://icon-library.com/images/logout-icon-png/logout-icon-png-13.jpg"
+                  alt=""
+                  width="25"
+                  height="25"
+                />
+                Cerrar sesión
+              </Link>
+            </li>
           </ul>
           <hr />
         </div>

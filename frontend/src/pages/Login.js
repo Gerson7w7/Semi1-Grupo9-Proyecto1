@@ -9,7 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [rememberme, setRememberme] = useState(false);
   const [showError, setShowError] = useState(false);
-  const ip = 'localhost'
+  const ip = 'http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/'
 
   const inicioSesion = (event) => {
     event.preventDefault();
@@ -20,6 +20,7 @@ const Login = () => {
       if (password === "123") {
         console.log("ADMIN");
         navigate("/inicio");
+        localStorage.setItem("id_usuario", 0);
         localStorage.setItem("isAdmin", 1);
       } else {
         console.log("ERROR");
@@ -28,7 +29,7 @@ const Login = () => {
     } else {
       console.log("USER");
       let inicioExitoso = false;
-      const url = `http://${ip}:5000/login`;
+      const url = `${ip}/login`;
       let data = { email: email, password: password, rememberme: rememberme };
       const fetchData = async () => {
         fetch(url, {
@@ -42,19 +43,20 @@ const Login = () => {
           .catch((error) => console.error("Error:", error))
           .then((res) => {
             console.log("res: ", res);
-            inicioExitoso = res.exito; // true o false
+            inicioExitoso = res.ok; // true o false
             localStorage.setItem("id_usuario", res.id_usuario);
+            if (inicioExitoso) {
+              navigate("/inicio");
+              localStorage.setItem("isAdmin", 0);
+            } else {
+              console.log("ERROR");
+              setShowError(true);
+            }
           });
       };
       fetchData();
 
-      if (inicioExitoso) {
-        navigate("/inicio");
-        localStorage.setItem("isAdmin", 0);
-      } else {
-        console.log("ERROR");
-        setShowError(true);
-      }
+      
     }
   };
 

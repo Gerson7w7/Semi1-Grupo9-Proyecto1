@@ -6,29 +6,10 @@ import AudioPlayer from "../components/Reproductor";
 const Favoritos = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   //const [favoriteSongs, setFavoriteSongs] = useState([]); // Estado para almacenar las canciones favoritas
-  const [favoriteSongs, setFavoriteSongs] = useState([
-    {
-      id: 1,
-      nombre: "Canción 1",
-      artista: "Artista 1",
-      duracion: "3:30",
-      imagen: "url_de_la_imagen_1",
-      isFavorite: true, // Puedes marcarlo como favorito por defecto si lo deseas
-    },
-    {
-      id: 2,
-      nombre: "Canción 2",
-      artista: "Artista 2",
-      duracion: "4:15",
-      imagen: "url_de_la_imagen_2",
-      isFavorite: true, // O no marcarlo como favorito por defecto
-    },
-    // Agrega más canciones favoritas aquí si lo deseas
-  ]);
-  const ip = "localhost";
+  const [favoriteSongs, setFavoriteSongs] = useState([]);
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
-  useEffect(() => {
-    // Obtén el ID del usuario desde localStorage
+  const recargar = () => {
     const id_usuario = localStorage.getItem("id_usuario");
 
     // Crea un objeto con el ID de usuario
@@ -36,7 +17,7 @@ const Favoritos = () => {
       id_usuario: id_usuario,
     };
 
-    const url = `http://${ip}:5000/favorites`; // Cambia la URL y el endpoint según tu backend
+    const url = `${ip}favorites`; // Cambia la URL y el endpoint según tu backend
 
     // Realizar una solicitud POST al servidor para obtener las canciones favoritas
     fetch(url, {
@@ -48,12 +29,38 @@ const Favoritos = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("datos recibidos", data)
         // Actualizar el estado con los datos de las canciones favoritas obtenidas
-        setFavoriteSongs(data);
+        setFavoriteSongs(data.songs);
       })
       .catch((error) => {
         console.error("Error al obtener las canciones favoritas:", error);
       });
+  }
+
+  const unfavorito = (id) => {
+
+    const url = `${ip}/favorito`;
+    const fetchData = async () => {
+      let data = { fav: id, id_usuario: localStorage.getItem("id_usuario")};
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((res) => {
+          recargar()
+        });
+    };
+    fetchData();
+  };
+  useEffect(() => {
+    // Obtén el ID del usuario desde localStorage
+    recargar()
   }, []); // El array de dependencias vacío asegura que esta solicitud solo se realice una vez al montar el componente
 
 
@@ -66,7 +73,7 @@ const Favoritos = () => {
           <div class="col">
             <table class="table table-hover">
               <tbody>
-                {favoriteSongs.map((song) => (
+                {favoriteSongs.length !== 0 ? favoriteSongs.map((song) => (
                   <tr key={song.id}>
                     <th scope="row" class="align-middle">
                       <img
@@ -84,13 +91,9 @@ const Favoritos = () => {
                         <button
                           type="button"
                           class={`btn btn-sm ${
-                            song.isFavorite ? "btn-success" : "btn-secondary"
+                            "btn-success" 
                           } favorite-button`}
-                          onClick={() => {
-                            // Aquí puedes implementar la lógica para cambiar el estado de favorito
-                            // Puedes realizar una solicitud al servidor para marcar o desmarcar como favorito
-                            // Actualizar el estado en el frontend, etc.
-                            // Ejemplo: toggleFavorite(song.id);
+                          onClick={() => {unfavorito(song.id)
                           }}
                         >
                           <img
@@ -117,7 +120,7 @@ const Favoritos = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )):<br></br>}
               </tbody>
             </table>
           </div>
