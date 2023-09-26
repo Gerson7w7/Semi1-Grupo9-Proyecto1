@@ -31,7 +31,7 @@ function RegistroUsuario() {
     const usuario = {
       nombres,
       apellidos,
-      imagen: foto,
+      imagen: Base64Modificada(foto),
       correo: email,
       password,
       fecha : fechaNacimiento
@@ -76,16 +76,24 @@ function RegistroUsuario() {
   const handleFileInputChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      // Aquí puedes procesar el archivo seleccionado (por ejemplo, cargarlo y mostrarlo como imagen de perfil).
-
       const fileReader = new FileReader();
       fileReader.onload = () => {
-        setFoto(fileReader.result);
+        const base64Image = fileReader.result; // Aquí está la imagen en formato base64
+        setFoto(base64Image);
       };
       fileReader.readAsDataURL(selectedFile);
     }
   };
+  
 
+  function Base64Modificada(base64String) {
+    const parts = base64String.split(",");
+    if (parts.length === 2) {
+      return parts[1];
+    } else {
+      return base64String; // Devuelve la cadena original si no se encuentra una coma
+    }
+  }
   return (
     <div className="mainlogin">
       {showError && mostrarError()}
