@@ -114,7 +114,7 @@ const Historico = () => {
           </div>
         </div>
       </div>
-        <AudioPlayer />
+      <AudioPlayer audioTracks={[]}/>
     </main>
   );
 };

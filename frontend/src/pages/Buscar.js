@@ -16,7 +16,11 @@ const Buscar = () => {
   const buscarFn = () => {
     const url = `${ip}/buscar`;
     const fetchData = async () => {
-      let data = { buscar: buscar };
+      let data = { 
+        buscar: buscar,
+        id_usuario : localStorage.getItem("id_usuario")
+       };
+       console.log("datos enviados:", data)
       fetch(url, {
         method: "POST",
         body: JSON.stringify(data),
@@ -27,9 +31,10 @@ const Buscar = () => {
         .then((res) => res.json())
         .catch((error) => console.error("Error:", error))
         .then((res) => {
-          setCanciones(res.canciones)
-          setAlbums(res.albums)
-          setArtistas(res.artistas)
+          console.log("respuesta: ", res)
+          setCanciones(res.canciones? res.canciones : [])
+          setAlbums(res.albums? res.albums : [])
+          setArtistas(res.artistas? res.artistas : [])
           let favoritos = []
           for (const f in canciones) {
             favoritos.push(f.esFavorito)
@@ -199,7 +204,7 @@ const Buscar = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {a.map((c) => (
+                    {albums.length !== 0 ? a.canciones.map((c) => (
                       <tr>
                         <th scope="row" class="align-middle">
                           <img
@@ -231,7 +236,7 @@ const Buscar = () => {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    )):<br></br>}
                   </tbody>
                 </table>
               </div>
@@ -260,7 +265,7 @@ const Buscar = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {a.map((c) => (
+                    {artistas.length !== 0 ? a.canciones.map((c) => (
                       <tr>
                         <th scope="row" class="align-middle">
                           <img
@@ -292,7 +297,7 @@ const Buscar = () => {
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    )):<br></br>}
                   </tbody>
                 </table>
               </div>

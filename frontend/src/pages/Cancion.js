@@ -27,7 +27,7 @@ const Cancion = () => {
         });
     };
     fetchData();
-  }, [canciones]);
+  }, []);
 
   const crearCancion = () => {
     const reader = new FileReader();
@@ -46,7 +46,7 @@ const Cancion = () => {
           artista: artista,
           mp3: parts2[1],
         };
-
+        console.log('data', data);
         fetch(url, {
           method: "POST",
           body: JSON.stringify(data),
@@ -307,7 +307,7 @@ const Cancion = () => {
                                     class="form-control"
                                     type="file"
                                     id="formFile"
-                                    onClick={(event) =>
+                                    onChange={(event) =>
                                       setImagen(event.target.files[0])
                                     }
                                   />
@@ -466,7 +466,7 @@ const Cancion = () => {
           </div>
         </div>
       </div>
-      <AudioPlayer />
+      <AudioPlayer audioTracks={[]}/>
     </main>
   );
 };

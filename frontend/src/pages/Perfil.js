@@ -15,7 +15,7 @@ function Perfil() {
   let inicioExitoso = false;
   const url1 = `${ip}modificar-perfil`;
   const id_usuario = localStorage.getItem("id_usuario");
-
+  console.log("usuario enviado", id_usuario)
   useEffect(() => {
     if (id_usuario) {
       const url = `${ip}perfil`;
@@ -30,6 +30,7 @@ function Perfil() {
       })
         .then((res) => res.json())
         .then((res) => {
+          console.log("datos recibidos", res)
           if (res.imagen) {
             setFotoPerfil(res.imagen);
           }

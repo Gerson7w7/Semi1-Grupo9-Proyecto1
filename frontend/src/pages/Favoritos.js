@@ -6,25 +6,7 @@ import AudioPlayer from "../components/Reproductor";
 const Favoritos = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   //const [favoriteSongs, setFavoriteSongs] = useState([]); // Estado para almacenar las canciones favoritas
-  const [favoriteSongs, setFavoriteSongs] = useState([
-    {
-      id: 1,
-      nombre: "Canción 1",
-      artista: "Artista 1",
-      duracion: "3:30",
-      imagen: "url_de_la_imagen_1",
-      isFavorite: true, // Puedes marcarlo como favorito por defecto si lo deseas
-    },
-    {
-      id: 2,
-      nombre: "Canción 2",
-      artista: "Artista 2",
-      duracion: "4:15",
-      imagen: "url_de_la_imagen_2",
-      isFavorite: true, // O no marcarlo como favorito por defecto
-    },
-    // Agrega más canciones favoritas aquí si lo deseas
-  ]);
+  const [favoriteSongs, setFavoriteSongs] = useState([]);
   const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
@@ -48,8 +30,9 @@ const Favoritos = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("datos recibidos", data)
         // Actualizar el estado con los datos de las canciones favoritas obtenidas
-        setFavoriteSongs(data);
+        setFavoriteSongs(data.songs);
       })
       .catch((error) => {
         console.error("Error al obtener las canciones favoritas:", error);
@@ -66,7 +49,7 @@ const Favoritos = () => {
           <div class="col">
             <table class="table table-hover">
               <tbody>
-                {favoriteSongs.map((song) => (
+                {favoriteSongs.length !== 0 ? favoriteSongs.map((song) => (
                   <tr key={song.id}>
                     <th scope="row" class="align-middle">
                       <img
@@ -117,7 +100,7 @@ const Favoritos = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )):<br></br>}
               </tbody>
             </table>
           </div>

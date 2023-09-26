@@ -20,6 +20,7 @@ const Login = () => {
       if (password === "123") {
         console.log("ADMIN");
         navigate("/inicio");
+        localStorage.setItem("id_usuario", 0);
         localStorage.setItem("isAdmin", 1);
       } else {
         console.log("ERROR");

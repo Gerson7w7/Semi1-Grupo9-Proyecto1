@@ -6,14 +6,7 @@ import AudioPlayer from "../components/Reproductor";
 
 const Playlist = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [playlists, setPlaylists] = useState([
-    {
-      nombre: "Mi Playlist 15",
-      descripcion: "Descripción de mi playlist",
-      imagen: "URL_de_la_imagen",
-    },
-    
-  ]);
+  const [playlists, setPlaylists] = useState([]);
   const [nombrePlaylist, setNombrePlaylist] = useState("");
   const [descripcionPlaylist, setDescripcionPlaylist] = useState("");
   const [imagenPlaylist, setImagenPlaylist] = useState(null);
@@ -21,6 +14,7 @@ const Playlist = () => {
   const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
   
   const obtenerPlaylists = () => {
+    console.log("ingreso")
     // Hacer una solicitud POST a la API para obtener las playlists
     const id_usuario = localStorage.getItem("id_usuario");
     console.log("Valor de id_usuario:", id_usuario);
@@ -36,8 +30,9 @@ const Playlist = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("datos de playlists" , data)
         // Actualizar el estado de las playlists con los datos recibidos
-        setPlaylists(data);
+        setPlaylists(data.playlist);
       })
       .catch((error) => {
         console.error("Error al obtener las playlists:", error);
@@ -45,8 +40,10 @@ const Playlist = () => {
   };
 
   useEffect(() => {
+    console.log("ooooo")
     obtenerPlaylists();
-  });
+    console.log("eeeee")
+  },[]);
 
   const toggleFormulario = () => {
     setMostrarFormulario(!mostrarFormulario);
@@ -68,12 +65,13 @@ const Playlist = () => {
     // Crear un objeto de playlist con los datos ingresados
     const id_usuario = localStorage.getItem("id_usuario");
     const nuevaPlaylist = {
-      id: id_usuario,
+      id_usuario: parseInt(id_usuario),
       nombre: nombrePlaylist,
       descripcion: descripcionPlaylist,
       imagenBase64: imagenBase64,
     };
 
+    console.log('nueva Playlist', nuevaPlaylist );
     // Enviar los datos al servidor mediante una solicitud POST
 
     const url = `${ip}playlist`;
@@ -87,8 +85,9 @@ const Playlist = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("playlistssss ", data)
         // Actualizar el estado de las playlists con la nueva playlist creada
-        setPlaylists(data);
+        setPlaylists(data.playlist);
 
         // Cerrar el formulario y limpiar los campos
         setMostrarFormulario(false);
