@@ -34,8 +34,9 @@ function RegistroUsuario() {
       imagen: foto,
       correo: email,
       password,
-      fechaNacimiento
+      fecha : fechaNacimiento
     };
+    console.log(usuario)
   
     // Realizar la solicitud POST al servidor
     fetch("http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/registro", {
@@ -57,7 +58,7 @@ function RegistroUsuario() {
       .catch((error) => {
         console.error("Error al registrar usuario:", error);
       });
-    window.location.href = "http://localhost:3000/inicio";
+    //window.location.href = "http://localhost:3000/inicio";
     setShowError(false);
   };
 
