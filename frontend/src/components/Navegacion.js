@@ -195,7 +195,7 @@ const Navegacion = () => {
                   width="25"
                   height="25"
                 />
-                Radio
+                Cerrar sesión
               </Link>
             </li>
           </ul>

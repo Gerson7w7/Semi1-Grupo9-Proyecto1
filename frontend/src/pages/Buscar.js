@@ -35,10 +35,7 @@ const Buscar = () => {
           setCanciones(res.canciones? res.canciones : [])
           setAlbums(res.albums? res.albums : [])
           setArtistas(res.artistas? res.artistas : [])
-          let favoritos = []
-          for (const f in canciones) {
-            favoritos.push(f.esFavorito)
-          }
+
         });
     };
     fetchData();
@@ -62,7 +59,9 @@ const Buscar = () => {
       })
         .then((res) => res.json())
         .catch((error) => console.error("Error:", error))
-        .then((res) => {});
+        .then((res) => {
+          buscarFn()
+        });
     };
     fetchData();
   };
@@ -142,7 +141,7 @@ const Buscar = () => {
                           <button
                             type="button"
                             class={`btn btn-sm  ${
-                              favoritos[index] ? "btn-success" : "btn-secondary"
+                              c.esFavorito ? "btn-success" : "btn-secondary"
                             } favorite-button`}
                             onClick={() => favorito(index, c.id)}
                           >
