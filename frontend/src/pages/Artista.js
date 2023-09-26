@@ -33,6 +33,7 @@ const Artista = () => {
       const base64Image = event.target.result;
       const parts = base64Image.split(",");
       const url = `${ip}/crear-artista`;
+      console.log(parts[1])
       const data = {
         nombre: nombre,
         imagen: parts[1], // Aquí está la imagen en formato base64
@@ -57,7 +58,9 @@ const Artista = () => {
 
   const actualizarArtista = (id) => {
     const reader = new FileReader();
+    console.log("imagen", imagen)
     reader.onload = (event) => {
+      console.log("enviando", "dentro")
       const base64Image = event.target.result;
       const parts = base64Image.split(",");
       const url = `${ip}/actualizar-artista`;
@@ -67,7 +70,7 @@ const Artista = () => {
         imagen: parts[1], // Aquí está la imagen en formato base64
         fecha: fecha,
       };
-
+      console.log("enviando", data)
       fetch(url, {
         method: "POST",
         body: JSON.stringify(data),
@@ -256,7 +259,7 @@ const Artista = () => {
                                     class="form-control"
                                     type="file"
                                     id="formFile"
-                                    onClick={(event) =>
+                                    onChange={(event) =>
                                       setImagen(event.target.files[0])
                                     }
                                   />
