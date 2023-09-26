@@ -25,7 +25,7 @@ const Favoritos = () => {
     },
     // Agrega más canciones favoritas aquí si lo deseas
   ]);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
     // Obtén el ID del usuario desde localStorage
@@ -36,7 +36,7 @@ const Favoritos = () => {
       id_usuario: id_usuario,
     };
 
-    const url = `http://${ip}:5000/favorites`; // Cambia la URL y el endpoint según tu backend
+    const url = `${ip}/favorites`; // Cambia la URL y el endpoint según tu backend
 
     // Realizar una solicitud POST al servidor para obtener las canciones favoritas
     fetch(url, {

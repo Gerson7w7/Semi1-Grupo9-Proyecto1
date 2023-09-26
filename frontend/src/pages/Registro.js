@@ -38,7 +38,7 @@ function RegistroUsuario() {
     };
   
     // Realizar la solicitud POST al servidor
-    fetch("http://localhost:5000/registro", {
+    fetch("http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/registro", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
