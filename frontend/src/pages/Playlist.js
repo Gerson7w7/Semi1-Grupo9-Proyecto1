@@ -18,13 +18,13 @@ const Playlist = () => {
   const [descripcionPlaylist, setDescripcionPlaylist] = useState("");
   const [imagenPlaylist, setImagenPlaylist] = useState(null);
   const [imagenBase64, setImagenBase64] = useState(""); // Almacenará la imagen en formato base64
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
   
   const obtenerPlaylists = () => {
     // Hacer una solicitud POST a la API para obtener las playlists
     const id_usuario = localStorage.getItem("id_usuario");
     console.log("Valor de id_usuario:", id_usuario);
-    const url = `http://${ip}:5000/playlists`;
+    const url = `${ip}playlists`;
     fetch(url, {
       method: "POST",
       headers: {
@@ -73,7 +73,7 @@ const Playlist = () => {
     };
 
     // Enviar los datos al servidor mediante una solicitud POST
-    const url = `http://${ip}:5000/playlist`;
+    const url = `${ip}playlist`;
     fetch(url, {
       method: "POST",
       headers: {

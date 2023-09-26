@@ -11,11 +11,11 @@ function Perfil() {
     useState("john@example.com");
   const [contrasena, setContrasena] = useState("");
   const [modoEdicion, setModoEdicion] = useState(false);
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
   const fileInputRef = useRef(null);
   console.log("PERFIL");
   let inicioExitoso = false;
-  const url = `http://${ip}:5000/perfil`;
+  const url = `${ip}perfil`;
   let data = {
     nombre: nombre,
     apellido: apellido,

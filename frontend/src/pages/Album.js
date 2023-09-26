@@ -22,11 +22,11 @@ const Album = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [albumToDelete, setAlbumToDelete] = useState(null); // Store the ID of the album to delete
 
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
     // Hacer una solicitud GET a la API para obtener los albums
-    const url = `http://${ip}:5000/album`;
+    const url = `${ip}album`;
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
@@ -64,7 +64,7 @@ const Album = () => {
     };
 
     // Enviar los datos al servidor mediante una solicitud POST
-    const url = `http://${ip}:5000/album`;
+    const url = `${ip}album`;
     fetch(url, {
       method: "POST",
       headers: {
@@ -125,7 +125,7 @@ const Album = () => {
   const handleConfirmDelete = () => {
     if (albumToDelete !== null) {
       // Send a POST request to the server to delete the album
-      const url = `http://${ip}:5000/delete-album`; // Replace with your actual delete album endpoint
+      const url = `${ip}delete-album`; // Replace with your actual delete album endpoint
       const requestOptions = {
         method: "POST",
         headers: {

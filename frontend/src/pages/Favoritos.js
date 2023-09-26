@@ -36,7 +36,7 @@ const Favoritos = () => {
       id_usuario: id_usuario,
     };
 
-    const url = `${ip}/favorites`; // Cambia la URL y el endpoint según tu backend
+    const url = `${ip}favorites`; // Cambia la URL y el endpoint según tu backend
 
     // Realizar una solicitud POST al servidor para obtener las canciones favoritas
     fetch(url, {

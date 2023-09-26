@@ -35,7 +35,7 @@ const InPlaylist = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchForm, setShowSearchForm] = useState(false); // Controla si se muestra el formulario de búsqueda
   const [songs, setSongs] = useState([]); // Inicialmente, el arreglo de canciones está vacío
-  const ip = "localhost";
+  const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -43,7 +43,7 @@ const InPlaylist = () => {
     const decodedNombrePlaylist = decodeURIComponent(nombrePlaylistParam);
     const encode = encodeURI(decodedNombrePlaylist);
 
-    const url = `http://${ip}:5000/inplaylist/${encode}`;
+    const url = `${ip}inplaylist/${encode}`;
     console.log(url);
 
     // Obtén el ID de usuario del localStorage
@@ -98,7 +98,7 @@ const InPlaylist = () => {
     };
 
     // Realizar una solicitud POST al backend para agregar la canción
-    const url = `http://${ip}:5000/playlist/add-song`; // URL del endpoint del servidor para agregar canciones
+    const url = `${ip}playlist/add-song`; // URL del endpoint del servidor para agregar canciones
     const requestOptions = {
       method: "POST",
       headers: {
@@ -161,7 +161,7 @@ const InPlaylist = () => {
       };
 
       // Realizar la solicitud POST al backend para eliminar la canción
-      const url = `http://${ip}:5000/playlist/delete-song`; // URL del endpoint del servidor para eliminar canciones
+      const url = `${ip}playlist/delete-song`; // URL del endpoint del servidor para eliminar canciones
       const requestOptions = {
         method: "POST",
         headers: {
