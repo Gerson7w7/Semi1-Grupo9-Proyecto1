@@ -28,10 +28,24 @@ const Favoritos = () => {
   const ip = "localhost";
 
   useEffect(() => {
+    // Obtén el ID del usuario desde localStorage
+    const id_usuario = localStorage.getItem("id_usuario");
+
+    // Crea un objeto con el ID de usuario
+    const requestData = {
+      id_usuario: id_usuario,
+    };
+
     const url = `http://${ip}:5000/favorites`; // Cambia la URL y el endpoint según tu backend
 
-    // Realizar una solicitud GET al servidor para obtener las canciones favoritas
-    fetch(url)
+    // Realizar una solicitud POST al servidor para obtener las canciones favoritas
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData), // Envía el objeto como datos JSON
+    })
       .then((response) => response.json())
       .then((data) => {
         // Actualizar el estado con los datos de las canciones favoritas obtenidas
@@ -41,6 +55,7 @@ const Favoritos = () => {
         console.error("Error al obtener las canciones favoritas:", error);
       });
   }, []); // El array de dependencias vacío asegura que esta solicitud solo se realice una vez al montar el componente
+
 
   return (
     <main>

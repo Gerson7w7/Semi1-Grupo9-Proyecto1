@@ -38,18 +38,33 @@ const InPlaylist = () => {
   const ip = "localhost";
 
   useEffect(() => {
-    const url = `http://${ip}:5000/playlist`;
-    // Realizar una solicitud GET al servidor para obtener las canciones de la playlist
-    
     const searchParams = new URLSearchParams(location.search);
     const nombrePlaylistParam = searchParams.get("nombrePlaylist");
     const decodedNombrePlaylist = decodeURIComponent(nombrePlaylistParam);
-    const encode = encodeURI(decodedNombrePlaylist)
-    console.log( url+`/${encode}`)
-    fetch(url+`/${encode}`)
+    const encode = encodeURI(decodedNombrePlaylist);
+
+    const url = `http://${ip}:5000/inplaylist/${encode}`;
+    console.log(url);
+
+    // Obtén el ID de usuario del localStorage
+    const id_usuario = localStorage.getItem("id_usuario");
+
+    // Crea un objeto con los datos que deseas enviar en el cuerpo de la solicitud POST
+    const data1 = {
+      id_usuario: id_usuario,
+      nombrePlaylist: nombrePlaylist,
+    };
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data1),
+    })
       .then((response) => response.json())
       .then((data) => {
-        // Actualizar el estado con los datos de las canciones obtenidas
+        // Actualiza el estado con los datos de las canciones obtenidas
         setSongs(data);
       })
       .catch((error) => {
@@ -71,40 +86,54 @@ const InPlaylist = () => {
   const handleAddToPlaylist = (songId) => {
     // Encuentra la canción seleccionada por su ID
     const selectedSong = songs.find((song) => song.id === songId);
-  
+
+    // Obtén el ID del usuario desde localStorage
+    const id_usuario = localStorage.getItem("id_usuario");
+
+    // Crea un objeto con los datos necesarios para agregar la canción
+    const data = {
+      id_usuario,
+      id_cancion: selectedSong.id,
+      nombre_playlist: nombrePlaylist, // Asegúrate de que esta variable esté definida en tu componente
+    };
+
     // Realizar una solicitud POST al backend para agregar la canción
     const url = `http://${ip}:5000/playlist/add-song`; // URL del endpoint del servidor para agregar canciones
     const requestOptions = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(selectedSong), // Envía los datos de la canción como datos JSON
+      body: JSON.stringify(data), // Envía los datos como datos JSON
     };
-  
+
     fetch(url, requestOptions)
       .then((response) => {
         if (response.ok) {
           // La canción se agregó con éxito en el servidor
           // Actualiza el estado en el frontend para reflejar la adición
-          setSongs(response);
-  
-          // Limpia el campo de búsqueda y los resultados
-          setSearchQuery("");
-          setSearchResults([]);
-  
-          // Puedes realizar alguna acción adicional si es necesario
-          console.log('Canción agregada con éxito.');
+          return response.json(); // Parsea la respuesta JSON
         } else {
           // Manejar el error si la solicitud no fue exitosa
-          console.error('Error al agregar la canción.');
+          console.error("Error al agregar la canción.");
+          throw new Error("Error al agregar la canción");
         }
       })
+      .then((updatedSongs) => {
+        // Actualiza el estado con las canciones actualizadas
+        setSongs(updatedSongs);
+
+        // Limpia el campo de búsqueda y los resultados
+        setSearchQuery("");
+        setSearchResults([]);
+
+        // Puedes realizar alguna acción adicional si es necesario
+        console.log("Canción agregada con éxito.");
+      })
       .catch((error) => {
-        console.error('Error en la solicitud:', error);
+        console.error("Error en la solicitud:", error);
       });
   };
-  
 
   const handleDeleteClick = (songId) => {
     setSongToDelete(songId); // Guarda el ID de la canción a eliminar
@@ -118,35 +147,52 @@ const InPlaylist = () => {
 
   const handleConfirmDelete = () => {
     if (songToDelete !== null) {
+      // Obtén el ID del usuario desde localStorage
+      const id_usuario = localStorage.getItem("id_usuario");
+
+      // Obtén el ID de la canción a eliminar y el nombre de la playlist
+      const { id, nombrePlaylist } = songToDelete;
+
+      // Crea un objeto con los datos necesarios para eliminar la canción
+      const data = {
+        id_usuario,
+        id_cancion: id,
+        nombre_playlist: nombrePlaylist,
+      };
+
       // Realizar la solicitud POST al backend para eliminar la canción
       const url = `http://${ip}:5000/playlist/delete-song`; // URL del endpoint del servidor para eliminar canciones
       const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ songId: songToDelete }), // Envía el ID de la canción a eliminar como datos JSON
+        body: JSON.stringify(data), // Envía los datos como datos JSON
       };
-  
+
       fetch(url, requestOptions)
         .then((response) => {
           if (response.ok) {
             // La canción se eliminó con éxito en el servidor
             // Actualiza el estado en el frontend para reflejar la eliminación
-            setSongToDelete(response)
-            setShowConfirmation(false);
-            setSongToDelete(null);
+            return response.json(); // Parsea la respuesta JSON
           } else {
             // Manejar el error si la solicitud no fue exitosa
-            console.error('Error al eliminar la canción.');
+            console.error("Error al eliminar la canción.");
+            throw new Error("Error al eliminar la canción");
           }
         })
+        .then((data) => {
+          // Asigna el nuevo arreglo de canciones a songs
+          setSongs(data);
+          setSongToDelete(null); // Limpia el valor de songToDelete
+          setShowConfirmation(false);
+        })
         .catch((error) => {
-          console.error('Error en la solicitud:', error);
+          console.error("Error en la solicitud:", error);
         });
     }
   };
-  
 
   return (
     <main>
@@ -219,7 +265,7 @@ const InPlaylist = () => {
 
         <div className="row g-3">
           <div className="col">
-          <table className="table table-hover red-background-table">
+            <table className="table table-hover red-background-table">
               <tbody>
                 {songs.map((song) => (
                   <tr key={song.id}>
@@ -274,7 +320,6 @@ const InPlaylist = () => {
                 Cancelar
               </button>
             </div>
-            
           </div>
         </div>
       )}
@@ -283,4 +328,3 @@ const InPlaylist = () => {
 };
 
 export default InPlaylist;
-
