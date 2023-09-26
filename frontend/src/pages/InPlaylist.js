@@ -75,16 +75,16 @@ const InPlaylist = () => {
   const handleSearchInputChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-
+  
     // Filtrar las canciones que coinciden con la búsqueda en tiempo real
     const filteredSongs = songs.filter((song) =>
       song.title.toLowerCase().includes(query.toLowerCase())
     );
-
+  
     // Actualizar los resultados de búsqueda
     setSearchResults(filteredSongs);
   };
-
+  
   const handleSearch = () => {
     const id_usuario = localStorage.getItem("id_usuario");
 
@@ -92,25 +92,27 @@ const InPlaylist = () => {
       id_usuario: id_usuario,
       buscar: searchQuery,
     };
-
-    const url = `${ip}buscar`;
+  
+    const url = `${ip}buscar`; 
     const requestOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data), 
     };
-
+  
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        setSongs(data.canciones);
+        
+        setSearchResults(data.canciones);
       })
       .catch((error) => {
         console.error("Error al buscar canciones:", error);
       });
   };
+  
 
   const handleAddToPlaylist = (songId) => {
     // Encuentra la canción seleccionada por su ID
@@ -255,14 +257,18 @@ const InPlaylist = () => {
               value={searchQuery}
               onChange={handleSearchInputChange}
             />
-            <button className="btn btn-primary" onClick={handleSearch}>
-              Buscar canciones
-            </button>
+            <button
+          className="btn btn-primary"
+          onClick={handleSearch}
+        >
+          Buscar canciones
+        </button>
           </div>
+          
         )}
-
+        
         {/* Mostrar resultados de búsqueda */}
-        {searchResults.length > 0 && (
+        {searchQuery && searchResults.length > 0 && (
           <div className="mb-3">
             <table className="table table-hover">
               <tbody>
