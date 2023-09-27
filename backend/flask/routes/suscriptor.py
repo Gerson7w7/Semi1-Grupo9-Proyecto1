@@ -195,7 +195,8 @@ def obtener_canciones_de_playlist():
         if playlist['status']:
             result = readCancionesPlaylist(playlist['id_playlist'])
             return jsonify({"songs": result['canciones']}), 200
-
+    except Exception as error:        
+        print(error)
         return jsonify({"songs": []}), 400
 
 @suscriptor_routes.route('/historial', methods=['POST'])
@@ -249,6 +250,3 @@ def reproducir_aleatorio():
     except Exception as error:
         print(error)
         return jsonify({"tracks": []}), 400
-
-# Finalmente, exportamos el blueprint
-

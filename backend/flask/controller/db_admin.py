@@ -62,6 +62,20 @@ def readArtistas():
     finally:
         cursor.close()
 
+def getIdArtistaCancion(id_cancion):
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute('SELECT id_artista FROM Canciones WHERE id_cancion = %s', (id_cancion,))
+        result = cursor.fetchone()
+        if result:
+            return {'status': True, 'id_artista': result['id_artista']}
+        else:
+            return {'status': False}
+    except Exception as e:
+        raise e
+    finally:
+        cursor.close()
+
 def readCancionesArtista(id_artista):
     cursor = conn.cursor(dictionary=True)
     try:
