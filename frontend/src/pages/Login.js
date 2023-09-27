@@ -1,7 +1,7 @@
 import React from "react";
 import "../assets/styles/Login.css";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -121,7 +121,7 @@ const Login = () => {
           </button>
           <p className="mt-3 mb-3 text-center">
             ¿No tienes cuenta?{" "}
-            <a href="http://localhost:3000/registro">Regístrate</a>
+            <Link to="/registro">Regístrate</Link>
           </p>
           <br />
           <br />

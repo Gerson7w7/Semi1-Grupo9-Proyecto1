@@ -1,8 +1,10 @@
 import { useState, useRef } from "react";
 import photo_default from "../images/registro_default.webp";
 import "../assets/styles/RegistroUsuario.css"; // Importa el archivo CSS
+import { useNavigate } from "react-router-dom";
 
 function RegistroUsuario() {
+  const navigate = useNavigate();
   const [nombres, setNombres] = useState("");
   const [apellidos, setApellidos] = useState("");
   const [foto, setFoto] = useState(photo_default); // Para subir la foto
@@ -49,7 +51,7 @@ function RegistroUsuario() {
       .then((response) => {
         if (response.ok) {
           // La solicitud fue exitosa, puedes redirigir al usuario a la página de inicio
-          window.location.href = "http://localhost:3000/inicio";
+          navigate("/inicio");
         } else {
           // La solicitud falló, maneja el error como desees (mostrar mensaje de error, etc.)
           console.error("Error al registrar usuario");
