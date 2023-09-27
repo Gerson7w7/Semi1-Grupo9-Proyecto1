@@ -2,8 +2,9 @@ var router = require('express').Router();
 
 const { getIdArtista, createArtista, readArtistas, updateArtista, deleteArtista,
         getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion,
-        getIdAlbum, createAlbum, deleteAlbum, readCancionesAlbum, addCancionAlbum, deleteCancionAlbum, readAlbumes  } = require('../controller/db_admin');
+        getIdAlbum, createAlbum, updateAlbum, deleteAlbum, readCancionesAlbum, addCancionAlbum, deleteCancionAlbum, readAlbumes  } = require('../controller/db_admin');
 const { guardarImagen, guardarCancion } = require('../controller/s3');
+const prefijoBucket = process.env.PREFIJO_BUCKET;
 
 router.post('/crear-artista', async (req, res) => {
     const { nombre, imagen, fecha } = req.body;
@@ -155,6 +156,32 @@ router.post('/crear-album', async (req, res) => {
     }
 });
 
+router.post('/actualizar-album', async (req, res) => {
+    const { nombre_antes, artista, nuevo_nombre, descripcion, imagen } = req.body;
+    try {
+        const res_artista = await getIdArtista(artista);
+        if (res_artista.status) {
+            const album = await getIdAlbum(nombre_antes, res_artista.id_artista);
+            if (album.status) {
+                const result = await updateAlbum(album.id_album, nuevo_nombre, descripcion);
+                if (imagen != '') {
+                    guardarImagen('albumes/'+ album.id_album, imagen);
+                    result.ok = true;
+                }
+                return res.status(200).json(result);
+            } else {
+                console.log(`Album "${nombre_antes}" no existe.`);
+            }
+        } else {
+            console.log(`Artista "${artista}" no existe.`);
+        }
+        res.status(200).json({ok: false});
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ok: false});
+    }
+});
+
 router.post('/delete-album', async (req, res) => {
     const id_album = req.body.id;
     try {
@@ -176,19 +203,26 @@ router.get('/album', async (req, res) => {
     }
 });
 
-router.get('/album/:nombre', async (req, res) => {
+router.get('/inalbum', async (req, res) => {
     try {
-        const nombre_album = (req.params.nombre).replaceAll('%20', ' ');
-        console.log(nombre_album)
-        const album = await getIdAlbum(nombre_album);
-        if (album.status) {
-            const result = await readCancionesAlbum(album.id_album);
-            return res.status(200).json({ songs: result.canciones });
+        const { nombre, artista } = req.body;
+        const result_artista = await getIdArtista(artista);
+        if (result_artista.status) {
+            const album = await getIdAlbum(nombre, result_artista.id_artista);
+            if (album.status) {
+                const result = await readCancionesAlbum(album.id_album);
+                const urlImagen = `${prefijoBucket}Fotos/albumes/${album.id_album}.jpg`;
+                return res.status(200).json({ songs: result.canciones, imagen_album: urlImagen });
+            } else {
+                console.log(`Album "${nombre}" no existe.`);
+            }
+        } else {
+            console.log(`Artista "${artista}" no existe.`);
         }
-        res.status(200).json({songs: []})
+        res.status(200).json({songs: [], imagen_album: ''})
     } catch (error) {
         console.log(error);
-        res.status(400).json({songs: []})
+        res.status(400).json({songs: [], imagen_album: ''})
     }
 });
 

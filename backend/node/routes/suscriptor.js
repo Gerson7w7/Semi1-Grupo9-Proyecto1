@@ -7,6 +7,7 @@ const { getPerfil, passwordCorrecto, modificarPerfil, buscarCanciones, buscarAlb
         getTopCanciones, getTopArtistas, getTopAlbums, getHistorial,
         reproducirAlbum, reproducirArtista, reproducirAleatorio } = require('../controller/db_user');
 const { guardarImagen } = require('../controller/s3');
+const prefijoBucket = process.env.PREFIJO_BUCKET;
 
 router.get('/inicio', async (req, res) => {
     try {
@@ -152,12 +153,15 @@ router.post('/inplaylist', async(req, res) => {
         const playlist = await getIdPlaylist(id_usuario, nombre);
         if (playlist.status) {
             const result = await readCancionesPlaylist(playlist.id_playlist);
-            return res.status(200).json( { songs: result.canciones });
+            const urlImagen = `${prefijoBucket}Fotos/playlists/${playlist.id_playlist}.jpg`;
+            return res.status(200).json({ songs: result.canciones, imagen_playlist: urlImagen });
+        } else { 
+            console.log(`Playlist "${nombre}" de usuario con ID ${id_usuario} no encontrada.`);
         }
-        res.status(400).json({ songs: [] });
+        res.status(400).json({ songs: [], imagen_playlist: '' });
     } catch (error) {
         console.log(error);
-        res.status(400).json({ songs: [] })
+        res.status(400).json({ songs: [], imagen_playlist: '' })
     }
 });
 

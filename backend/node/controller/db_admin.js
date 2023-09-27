@@ -299,6 +299,26 @@ function readAlbumes() {
     });
 }
 
+function updateAlbum(id_album, nombre, descripcion) {
+    return new Promise((resolve, reject) => {
+        conn.query(`UPDATE Albumes 
+                    SET nombre = CASE WHEN LENGTH(?) > 0 THEN ? ELSE nombre END,
+                        descripcion = CASE WHEN ? > 0 THEN ? ELSE descripcion END
+                    WHERE id_album = ?`,
+                    [nombre, nombre, descripcion, descripcion, id_album], ((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                if (result.changedRows > 0) {
+                    resolve({ ok: true })
+                } else {
+                    resolve({ ok: false })
+                }
+            }
+        }));
+    });
+}
+
 function readCancionesAlbum(id_album) {
     return new Promise((resolve, reject) => {
         conn.query(`SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista FROM Canciones c
@@ -389,6 +409,7 @@ module.exports = {
 
     getIdAlbum,
     createAlbum,
+    updateAlbum,
     readAlbumes,
     deleteAlbum,
     readCancionesAlbum,
