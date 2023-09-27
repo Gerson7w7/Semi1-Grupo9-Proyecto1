@@ -203,7 +203,7 @@ router.get('/album', async (req, res) => {
     }
 });
 
-router.get('/inalbum', async (req, res) => {
+router.post('/inalbum', async (req, res) => {
     try {
         const { nombre, artista } = req.body;
         const result_artista = await getIdArtista(artista);
@@ -232,7 +232,7 @@ router.post('/add-song-album', async (req, res) => {
         const res_artista = await getIdArtista(artista);
         if (res_artista.status) {
             const album = await getIdAlbum(nombre_album, res_artista.id_artista);
-            if (!album.status) {
+            if (album.status) {
                 const result = await addCancionAlbum(id_cancion, album.id_album);
                 if (result.status) {
                     const c = await readCancionesAlbum(album.id_album);
@@ -252,8 +252,8 @@ router.post('/delete-song-album', async (req, res) => {
     try {
         const res_artista = await getIdArtista(artista);
         if (res_artista.status) {
-            const album = await getIdAlbum(nombre, res_artista.id_artista);
-            if (!album.status) {
+            const album = await getIdAlbum(nombre_album, res_artista.id_artista);
+            if (album.status) {
                 const result = await deleteCancionAlbum(id_cancion, album.id_album);
                 if (result.status) {
                     const c = await readCancionesAlbum(album.id_album);
