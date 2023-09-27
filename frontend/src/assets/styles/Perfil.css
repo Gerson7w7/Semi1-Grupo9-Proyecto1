@@ -90,7 +90,7 @@
     font-size: 16px; /* Tamaño de fuente del botón */
   }
   
-  .add-button {
+  .add-button-perfil {
     border: none;
     border-radius: 50%; /* Hace que el botón sea circular */
     background-color: #007bff; /* Color de fondo del botón */
@@ -98,8 +98,8 @@
     font-size: 18px; /* Tamaño de fuente del símbolo "+" */
     width: 40px; /* Tamaño del botón */
     height: 30px;
-    bottom: 550px; /* Ajusta la posición según tus preferencias */
-    right: 550px; /* Ajusta la posición según tus preferencias */
+    bottom: 200px;
+    right: 200px; /* Ajusta la posición según tus preferencias */
   }
   
   .user-info {

@@ -119,7 +119,7 @@ function Perfil() {
                   alt="Foto de Perfil"
                 />
                 <button
-                  className="add-button"
+                  className="add-button-perfi"
                   onClick={handleAgregarImagenClick}
                 >
                   +
