@@ -280,7 +280,7 @@ function readPlaylists(id_usuario) {
                     playlists.push({
                         nombre: playlist.nombre,
                         descripcion: playlist.descripcion,
-                        imagen: `${prefijoBucket}Fotos/playlists/${playlist.id_usuario}.jpg`
+                        imagen: `${prefijoBucket}Fotos/playlists/${playlist.id_playlist}.jpg`
                     })
                 }
                 resolve({ 'playlist': playlists });
@@ -332,7 +332,7 @@ function readCancionesPlaylist(id_playlist) {
                         id: cancion.id_cancion,
                         nombre: cancion.nombre,
                         duracion: cancion.duracion,
-                        imagen: `${prefijoBucket}Fotos/canciones/${cancion.id_cancio}.jpg`,
+                        imagen: `${prefijoBucket}Fotos/canciones/${cancion.id_cancion}.jpg`,
                         artista: cancion.artista
                     })
                 }
