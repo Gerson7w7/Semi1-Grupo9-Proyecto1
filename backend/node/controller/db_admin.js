@@ -378,7 +378,7 @@ function deleteCancionAlbum(id_cancion, id_album) {
 
 function deleteAlbum(id_album) {
     return new Promise((resolve, reject) => {
-        conn.query('DELETE FROM Albumes WHERE id_cancion = ?', id_album, ((err, result) => {
+        conn.query('DELETE FROM Albumes WHERE id_album = ?', id_album, ((err, result) => {
             if (err) {
                 reject(err);
             } else {
