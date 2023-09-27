@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Navegacion from "../components/Navegacion";
 import "../assets/styles/Buscar.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate  } from "react-router-dom";
 
 const InAlbum = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const nombreAlbum = params.get("nombreAlbum");
+  const artistaAlbum = params.get("nombreArtista");
+  const [imagenAlbum, setImagenAlbum] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [songToDelete, setSongToDelete] = useState(null); // Almacena el ID de la canción a eliminar
   /*const [songs, setSongs] = useState([
@@ -31,6 +34,7 @@ const InAlbum = () => {
     // Agrega más canciones aquí
   ]);*/
 
+  const [idDelete, setIdDelete] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchForm, setShowSearchForm] = useState(false); // Controla si se muestra el formulario de búsqueda
@@ -38,19 +42,27 @@ const InAlbum = () => {
   const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
   useEffect(() => {
-    const url = `${ip}album`;
-    // Realizar una solicitud GET al servidor para obtener las canciones de la album
-    
-    const searchParams = new URLSearchParams(location.search);
-    const nombrealbumParam = searchParams.get("nombreAlbum");
-    const decodedNombrealbum = decodeURIComponent(nombrealbumParam);
-    const encode = encodeURI(decodedNombrealbum)
-    console.log( url+`/${encode}`)
-    fetch(url+`/${encode}`)
+    const url = `${ip}inalbum`;
+    console.log(url);
+    // Crea un objeto con los datos que deseas enviar en el cuerpo de la solicitud POST
+
+    const data1 = {
+      nombre: nombreAlbum,
+      artista: artistaAlbum,
+    };
+    console.log("data1->", data1);
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data1),
+    })
       .then((response) => response.json())
       .then((data) => {
-        // Actualizar el estado con los datos de las canciones obtenidas
-        setSongs(data);
+        // Actualiza el estado con los datos de las canciones obtenidas
+        setSongs(data.songs);
+        setImagenAlbum(data.imagen_album);
       })
       .catch((error) => {
         console.error("Error al obtener las canciones:", error);
@@ -61,54 +73,98 @@ const InAlbum = () => {
     const query = e.target.value;
     setSearchQuery(query);
 
-    // Filtrar las canciones que coinciden con la búsqueda
+    // Filtrar las canciones que coinciden con la búsqueda en tiempo real
     const filteredSongs = songs.filter((song) =>
       song.title.toLowerCase().includes(query.toLowerCase())
     );
+
+    // Actualizar los resultados de búsqueda
     setSearchResults(filteredSongs);
   };
 
-  const handleAddToalbum = (songId) => {
+  const handleSearch = () => {
+    const id_usuario = localStorage.getItem("id_usuario");
+
+    const data = {
+      id_usuario: id_usuario,
+      buscar: searchQuery,
+    };
+
+    const url = `${ip}buscar`;
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    };
+
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        setSearchResults(data.canciones);
+      })
+      .catch((error) => {
+        console.error("Error al buscar canciones:", error);
+      });
+  };
+
+  const handleAddToAlbum = (songId) => {
     // Encuentra la canción seleccionada por su ID
-    const selectedSong = songs.find((song) => song.id === songId);
-  
+
+    // Obtén el ID del usuario desde localStorage
+    const id_usuario = localStorage.getItem("id_usuario");
+
+    // Crea un objeto con los datos necesarios para agregar la canción
+    const data = {
+      artista: artistaAlbum,
+      id_cancion: songId,
+      nombre_album: nombreAlbum, // Asegúrate de que esta variable esté definida en tu componente
+    };
+
     // Realizar una solicitud POST al backend para agregar la canción
     const url = `${ip}add-song-album`; // URL del endpoint del servidor para agregar canciones
     const requestOptions = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(selectedSong), // Envía los datos de la canción como datos JSON
+      body: JSON.stringify(data), // Envía los datos como datos JSON
     };
-  
+
     fetch(url, requestOptions)
       .then((response) => {
         if (response.ok) {
           // La canción se agregó con éxito en el servidor
           // Actualiza el estado en el frontend para reflejar la adición
-          setSongs(response);
-  
-          // Limpia el campo de búsqueda y los resultados
-          setSearchQuery("");
-          setSearchResults([]);
-  
-          // Puedes realizar alguna acción adicional si es necesario
-          console.log('Canción agregada con éxito.');
+          return response.json(); // Parsea la respuesta JSON
         } else {
           // Manejar el error si la solicitud no fue exitosa
-          console.error('Error al agregar la canción.');
+          console.error("Error al agregar la canción.");
+          throw new Error("Error al agregar la canción");
         }
       })
+      .then((updatedSongs) => {
+        console.log("aver", updatedSongs);
+        // Actualiza el estado con las canciones actualizadas
+        setSongs(updatedSongs.songs);
+
+        // Limpia el campo de búsqueda y los resultados
+        setSearchQuery("");
+        setSearchResults([]);
+
+        // Puedes realizar alguna acción adicional si es necesario
+        console.log("Canción agregada con éxito.");
+      })
       .catch((error) => {
-        console.error('Error en la solicitud:', error);
+        console.error("Error en la solicitud:", error);
       });
   };
-  
 
-  const handleDeleteClick = (songId) => {
+  const handleDeleteClick = (songId, title) => {
     setSongToDelete(songId); // Guarda el ID de la canción a eliminar
     setShowConfirmation(true);
+    setIdDelete(songId);
   };
 
   const handleCancelClick = () => {
@@ -116,37 +172,141 @@ const InAlbum = () => {
     setSongToDelete(null); // Restablece el valor de songToDelete
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = (id_cancion) => {
     if (songToDelete !== null) {
+      // Obtén el ID del usuario desde localSt
+      const searchParams = new URLSearchParams(location.search);
+      const nombreAlbumParam = searchParams.get("nombreAlbum");
+      const id_usuario = localStorage.getItem("id_usuario");
+
+      // Obtén el ID de la canción a eliminar y el nombre de la album
+
+      // Crea un objeto con los datos necesarios para eliminar la canción
+      const data = {
+        id_cancion,
+        nombre_album: nombreAlbumParam,
+        artista: artistaAlbum,
+      };
+      console.log("ladata", data);
+
       // Realizar la solicitud POST al backend para eliminar la canción
       const url = `${ip}delete-song-album`; // URL del endpoint del servidor para eliminar canciones
       const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ songId: songToDelete }), // Envía el ID de la canción a eliminar como datos JSON
+        body: JSON.stringify(data), // Envía los datos como datos JSON
       };
-  
+
       fetch(url, requestOptions)
         .then((response) => {
           if (response.ok) {
             // La canción se eliminó con éxito en el servidor
             // Actualiza el estado en el frontend para reflejar la eliminación
-            setSongToDelete(response)
-            setShowConfirmation(false);
-            setSongToDelete(null);
+            return response.json(); // Parsea la respuesta JSON
           } else {
             // Manejar el error si la solicitud no fue exitosa
-            console.error('Error al eliminar la canción.');
+            console.error("Error al eliminar la canción.");
+            throw new Error("Error al eliminar la canción");
           }
         })
+        .then((data) => {
+          // Asigna el nuevo arreglo de canciones a songs
+          // Recargar la página actual
+          window.location.reload();
+        })
         .catch((error) => {
-          console.error('Error en la solicitud:', error);
+          console.error("Error en la solicitud:", error);
         });
     }
   };
-  
+
+  const [showModifyForm, setShowModifyForm] = useState(false); // Controla si se muestra el formulario de modificación
+  const [albumData, setAlbumData] = useState({
+    nombre: nombreAlbum,
+    descripcion: "",
+    imagen: null, 
+  });
+
+  const handleModifyClick = () => {
+    setShowModifyForm(true);
+  };
+
+  const handleModifyInputChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "imagen") {
+      // Si el campo es para la imagen, convierte la imagen a base64
+      const file = files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setAlbumData({
+            ...albumData,
+            imagen: e.target.result, // Almacena la imagen como base64
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      setAlbumData({
+        ...albumData,
+        [name]: value,
+      });
+    }
+  };
+
+  const handleModifyAlbum = () => {
+    
+    // Crear un objeto para enviar datos como JSON
+    const requestData = {
+      nombre_antes: nombreAlbum,
+      nuevo_nombre: albumData.nombre,
+      descripcion: albumData.descripcion,
+      imagen: Base64Modificada(albumData.imagen), 
+      artista: artistaAlbum
+    };
+
+    console.log(requestData)
+
+    // Realizar una solicitud POST para modificar los datos del álbum
+    const url = `${ip}actualizar-album`; // URL del endpoint del servidor para modificar datos del álbum
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData), // Envía los datos como JSON
+    };
+
+    fetch(url, requestOptions)
+      .then((response) => {
+        if (response.ok) {
+          // Los datos del álbum se modificaron con éxito en el servidor
+          // Puedes realizar alguna acción adicional si es necesario
+          console.log("Datos del álbum modificados con éxito.");
+
+          // Recargar la página actual
+          navigate(`/inalbum?nombreAlbum=${albumData.nombre}&nombreArtista=${artistaAlbum}`);
+        } else {
+          // Manejar el error si la solicitud no fue exitosa
+          console.error("Error al modificar los datos del álbum.");
+          throw new Error("Error al modificar los datos del álbum");
+        }
+      })
+      .catch((error) => {
+        console.error("Error en la solicitud:", error);
+      });
+  };
+
+  function Base64Modificada(base64String) {
+    const parts = base64String.split(",");
+    if (parts.length === 2) {
+      return parts[1];
+    } else {
+      return base64String; // Devuelve la cadena original si no se encuentra una coma
+    }
+  }
 
   return (
     <main>
@@ -154,7 +314,7 @@ const InAlbum = () => {
       <div className="container">
         <div className="image-box">
           <img
-            src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
+            src={imagenAlbum}
             alt=""
             width="1300"
             height="400"
@@ -180,6 +340,9 @@ const InAlbum = () => {
               value={searchQuery}
               onChange={handleSearchInputChange}
             />
+            <button className="btn btn-primary" onClick={handleSearch}>
+              Buscar canciones
+            </button>
           </div>
         )}
 
@@ -192,20 +355,20 @@ const InAlbum = () => {
                   <tr key={song.id}>
                     <th scope="row" className="align-middle">
                       <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
+                        src={song.imagen} // Usa la imagen recibida en el JSON
                         alt=""
                         width="100"
                         height="60"
                       />
                     </th>
-                    <td className="align-middle">{song.title}</td>
-                    <td className="align-middle">{song.artist}</td>
-                    <td className="align-middle">{song.duration}</td>
+                    <td className="align-middle">{song.nombre}</td>
+                    <td className="align-middle">{song.artista}</td>
+                    <td className="align-middle">{song.duracion}</td>
                     <td className="text-end align-middle">
                       <button
                         type="button"
                         className="btn btn-sm btn-primary"
-                        onClick={() => handleAddToalbum(song.id)}
+                        onClick={() => handleAddToAlbum(song.id)}
                       >
                         Agregar a la album
                       </button>
@@ -217,23 +380,74 @@ const InAlbum = () => {
           </div>
         )}
 
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowModifyForm(!showModifyForm)}
+        >
+          {showModifyForm ? "Cancelar Modificación" : "Modificar Datos Album"}
+        </button>
+
+        {showModifyForm && (
+          <div>
+            <h2>Modificar Datos Album</h2>
+            <form>
+              <div className="mb-3">
+                <label htmlFor="nombre">Nombre (Obligatorio)</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="nombre"
+                  name="nombre"
+                  value={albumData.nombre}
+                  onChange={handleModifyInputChange}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="descripcion">Descripción</label>
+                <textarea
+                  className="form-control"
+                  id="descripcion"
+                  name="descripcion"
+                  value={albumData.descripcion}
+                  onChange={handleModifyInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="imagen">Imagen de portada (Obligatorio)</label>
+                <input
+                  type="file"
+                  className="form-control"
+                  id="imagen"
+                  name="imagen"
+                  accept="image/*"
+                  onChange={handleModifyInputChange}
+                  required
+                />
+              </div>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleModifyAlbum}
+              >
+                Aceptar
+              </button>
+            </form>
+          </div>
+        )}
+
         <div className="row g-3">
           <div className="col">
-          <table className="table table-hover red-background-table">
+            <table className="table table-hover red-background-table">
               <tbody>
                 {songs.map((song) => (
                   <tr key={song.id}>
                     <th scope="row" className="align-middle">
-                      <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
-                        alt=""
-                        width="100"
-                        height="60"
-                      />
+                      <img src={song.imagen} alt="" width="100" height="60" />
                     </th>
-                    <td className="align-middle">{song.title}</td>
-                    <td className="align-middle">{song.artist}</td>
-                    <td className="align-middle">{song.duration}</td>
+                    <td className="align-middle">{song.nombre}</td>
+                    <td className="align-middle">{song.artista}</td>
+                    <td className="align-middle">{song.duracion}</td>
                     <td className="text-end align-middle">
                       <div className="btn-group">
                         {/* Botón original */}
@@ -249,7 +463,9 @@ const InAlbum = () => {
                         <button
                           type="button"
                           className="btn btn-sm btn-danger"
-                          onClick={() => handleDeleteClick(song.id)}
+                          onClick={() =>
+                            handleDeleteClick(song.id, song.nombre)
+                          }
                         >
                           Eliminar canción
                         </button>
@@ -267,14 +483,16 @@ const InAlbum = () => {
           <div className="modal-content">
             <div className="centered-modal">
               <p>¿Estás seguro de eliminar esta canción?</p>
-              <button className="btn btn-danger" onClick={handleConfirmDelete}>
+              <button
+                className="btn btn-danger"
+                onClick={handleConfirmDelete(idDelete)}
+              >
                 Aceptar
               </button>
               <button className="btn btn-secondary" onClick={handleCancelClick}>
                 Cancelar
               </button>
             </div>
-            
           </div>
         </div>
       )}
@@ -283,4 +501,3 @@ const InAlbum = () => {
 };
 
 export default InAlbum;
-

@@ -6,6 +6,14 @@ import { Link } from "react-router-dom";
 const Album = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [albums, setAlbums] = useState([
+    /*{
+      id: 1,
+      nombre: "nombreAlbum",
+      descripcion: "descripcionAlbum",
+      imagen: "imagenBase64",
+      artista: "nombreArtista",
+    }*/
+
   ]);
   const [nombreAlbum, setNombreAlbum] = useState("");
   const [descripcionAlbum, setDescripcionAlbum] = useState("");
@@ -13,7 +21,7 @@ const Album = () => {
   const [imagenBase64, setImagenBase64] = useState("");
   const [nombreArtista, setNombreArtista] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [albumToDelete, setAlbumToDelete] = useState(null); // Store the ID of the album to delete
+  const [albumToDelete, setAlbumToDelete] = useState(null); 
 
   const ip = "http://balancer-semi1-p1-830674914.us-east-1.elb.amazonaws.com/";
 
@@ -23,7 +31,7 @@ const Album = () => {
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
-        console.log("infaaao", data)
+        console.log("infaaao", data);
         // Actualizar el estado de los albums con los datos recibidos
         setAlbums(data);
       })
@@ -53,10 +61,10 @@ const Album = () => {
     const nuevoAlbum = {
       nombre: nombreAlbum,
       descripcion: descripcionAlbum,
-      imagen: imagenBase64,
+      imagen: Base64Modificada(imagenBase64),
       artista: nombreArtista,
     };
-    console.log("sdasd", nuevoAlbum)
+    console.log("sdasd", nuevoAlbum);
     // Enviar los datos al servidor mediante una solicitud POST
     const url = `${ip}crear-album`;
     fetch(url, {
@@ -68,12 +76,11 @@ const Album = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("infooooo", data)
+        console.log("infooooo", data);
         // Actualizar el estado de los albums con el nuevo album creado
 
         // Cerrar el formulario y limpiar los campos// Recargar la página actual
         window.location.reload();
-
       })
       .catch((error) => {
         console.error("Error al crear el Album:", error);
@@ -104,35 +111,33 @@ const Album = () => {
   /// delete
 
   const handleDeleteClick = (albumId) => {
-    setAlbumToDelete(albumId); // Store the ID of the album to delete
-    setShowConfirmation(true); // Show the confirmation modal
+    console.log(albumId)
+    setAlbumToDelete(albumId); 
+    setShowConfirmation(true); 
   };
 
   const handleCancelClick = () => {
-    setShowConfirmation(false); // Hide the confirmation modal
-    setAlbumToDelete(null); // Reset the albumToDelete variable
+    setShowConfirmation(false); 
+    setAlbumToDelete(null);
   };
 
   const handleConfirmDelete = () => {
+    console.log(albumToDelete)
     if (albumToDelete !== null) {
-      // Send a POST request to the server to delete the album
-      const url = `${ip}delete-album`; // Replace with your actual delete album endpoint
+      
+      const url = `${ip}delete-album`; 
       const requestOptions = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ albumId: albumToDelete }), // Send the album ID as JSON data
+        body: JSON.stringify({ id: albumToDelete }), 
       };
 
       fetch(url, requestOptions)
         .then((response) => {
           if (response.ok) {
-            // Album deleted successfully on the server
-            // You can update the state or perform other actions as needed
-            console.log("Album deleted successfully.");
-
-            // Hide the confirmation modal and reset the albumToDelete variable
+            window.location.reload();
             setShowConfirmation(false);
             setAlbumToDelete(null);
           } else {
@@ -145,6 +150,15 @@ const Album = () => {
         });
     }
   };
+
+  function Base64Modificada(base64String) {
+    const parts = base64String.split(",");
+    if (parts.length === 2) {
+      return parts[1];
+    } else {
+      return base64String; // Devuelve la cadena original si no se encuentra una coma
+    }
+  }
 
   return (
     <main>
@@ -248,6 +262,8 @@ const Album = () => {
                             pathname: "/inalbum",
                             search: `?nombreAlbum=${encodeURIComponent(
                               album.nombre
+                            )}&nombreArtista=${encodeURIComponent(
+                              album.artista
                             )}`,
                           }}
                         >
@@ -268,9 +284,9 @@ const Album = () => {
                         <button
                           type="button"
                           className="btn btn-sm btn-danger"
-                          onClick={() => handleDeleteClick(album.idalbum)}
+                          onClick={() => handleDeleteClick(album.id)}
                         >
-                          Delete Album
+                          Eliminar
                         </button>
                       </div>
                     </td>
@@ -285,12 +301,12 @@ const Album = () => {
         <div className="modal" style={{ top: "350px", left: "775px" }}>
           <div className="modal-content">
             <div className="centered-modal">
-              <p>Are you sure you want to delete this album?</p>
+              <p>Estas seguro de eliminar este album?</p>
               <button className="btn btn-danger" onClick={handleConfirmDelete}>
-                Confirm
+                Aceptar
               </button>
               <button className="btn btn-secondary" onClick={handleCancelClick}>
-                Cancel
+                Cancelar
               </button>
             </div>
           </div>
