@@ -252,7 +252,7 @@ router.post('/delete-song-album', async (req, res) => {
     try {
         const res_artista = await getIdArtista(artista);
         if (res_artista.status) {
-            const album = await getIdAlbum(nombre, res_artista.id_artista);
+            const album = await getIdAlbum(nombre_album, res_artista.id_artista);
             if (album.status) {
                 const result = await deleteCancionAlbum(id_cancion, album.id_album);
                 if (result.status) {
