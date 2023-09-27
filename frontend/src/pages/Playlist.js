@@ -68,7 +68,7 @@ const Playlist = () => {
       id_usuario: parseInt(id_usuario),
       nombre: nombrePlaylist,
       descripcion: descripcionPlaylist,
-      imagenBase64: imagenBase64,
+      imagen: Base64Modificada(imagenBase64),
     };
 
     console.log('nueva Playlist', nuevaPlaylist );
@@ -121,6 +121,15 @@ const Playlist = () => {
     reader.readAsDataURL(imagenSeleccionada);
     setImagenPlaylist(imagenSeleccionada);
   };
+
+  function Base64Modificada(base64String) {
+    const parts = base64String.split(",");
+    if (parts.length === 2) {
+      return parts[1];
+    } else {
+      return base64String; // Devuelve la cadena original si no se encuentra una coma
+    }
+  }
 
   return (
     <main>
