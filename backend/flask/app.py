@@ -11,11 +11,11 @@ CORS(app)
 # Configura el límite de tamaño de solicitud a 10 MB (10 * 1024 * 1024 bytes)
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB en byte
 # Agrega las rutas al servidor Flask
-app.register_blueprint(auth_routes, url_prefix='/')
+app.register_blueprint(auth_routes)
 # Registra las rutas de administrador utilizando app
-app.register_blueprint(admin_routes, url_prefix='/')
+app.register_blueprint(admin_routes)
 # Registra las rutas de suscriptor utilizando app
-app.register_blueprint(suscriptor_routes, url_prefix='/')
+app.register_blueprint(suscriptor_routes)
 
 # Define una ruta GET en la raíz ("/pong")
 @app.route('/', methods=['GET'])
