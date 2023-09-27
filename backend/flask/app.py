@@ -1,6 +1,5 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-
 from routes.index import auth_routes #Importar rutas
 from routes.admin import admin_routes
 from routes.suscriptor import suscriptor_routes
@@ -8,6 +7,8 @@ from routes.suscriptor import suscriptor_routes
 app = Flask(__name__)
 # Habilita CORS (Cross-Origin Resource Sharing) para permitir solicitudes desde diferentes orígenes.
 CORS(app)
+
+
 # Configura el límite de tamaño de solicitud a 10 MB (10 * 1024 * 1024 bytes)
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB en byte
 # Agrega las rutas al servidor Flask

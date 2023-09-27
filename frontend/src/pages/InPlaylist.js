@@ -260,7 +260,7 @@ const InPlaylist = () => {
               className="form-control"
               placeholder="Buscar canción"
               value={searchQuery}
-              onChange={handleSearchInputChange}
+              onChange={(e) => setSearchQuery(e.target.value.toString())}
             />
             <button
           className="btn btn-primary"

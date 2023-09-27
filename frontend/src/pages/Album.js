@@ -33,7 +33,7 @@ const Album = () => {
       .then((data) => {
         console.log("infaaao", data);
         // Actualizar el estado de los albums con los datos recibidos
-        setAlbums(data);
+        setAlbums(data.album);
       })
       .catch((error) => {
         console.error("Error al obtener los albums:", error);

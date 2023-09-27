@@ -60,6 +60,7 @@ const InAlbum = () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("dataalbum",data)
         // Actualiza el estado con los datos de las canciones obtenidas
         setSongs(data.songs);
         setImagenAlbum(data.imagen_album);
@@ -69,18 +70,7 @@ const InAlbum = () => {
       });
   }, [nombreAlbum]);
 
-  const handleSearchInputChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    // Filtrar las canciones que coinciden con la búsqueda en tiempo real
-    const filteredSongs = songs.filter((song) =>
-      song.title.toLowerCase().includes(query.toLowerCase())
-    );
-
-    // Actualizar los resultados de búsqueda
-    setSearchResults(filteredSongs);
-  };
+  
 
   const handleSearch = () => {
     const id_usuario = localStorage.getItem("id_usuario");
@@ -121,6 +111,7 @@ const InAlbum = () => {
       id_cancion: songId,
       nombre_album: nombreAlbum, // Asegúrate de que esta variable esté definida en tu componente
     };
+    console.log("enviando",data)
 
     // Realizar una solicitud POST al backend para agregar la canción
     const url = `${ip}add-song-album`; // URL del endpoint del servidor para agregar canciones
@@ -134,12 +125,14 @@ const InAlbum = () => {
 
     fetch(url, requestOptions)
       .then((response) => {
+        console.log("responsa", response)
         if (response.ok) {
           // La canción se agregó con éxito en el servidor
           // Actualiza el estado en el frontend para reflejar la adición
           return response.json(); // Parsea la respuesta JSON
         } else {
           // Manejar el error si la solicitud no fue exitosa
+          console.log(response)
           console.error("Error al agregar la canción.");
           throw new Error("Error al agregar la canción");
         }
@@ -287,7 +280,8 @@ const InAlbum = () => {
           console.log("Datos del álbum modificados con éxito.");
 
           // Recargar la página actual
-          navigate(`/inalbum?nombreAlbum=${albumData.nombre}&nombreArtista=${artistaAlbum}`);
+          window.location.reload();
+
         } else {
           // Manejar el error si la solicitud no fue exitosa
           console.error("Error al modificar los datos del álbum.");
@@ -338,7 +332,7 @@ const InAlbum = () => {
               className="form-control"
               placeholder="Buscar canción"
               value={searchQuery}
-              onChange={handleSearchInputChange}
+              onChange={(e) => setSearchQuery(e.target.value.toString())}
             />
             <button className="btn btn-primary" onClick={handleSearch}>
               Buscar canciones

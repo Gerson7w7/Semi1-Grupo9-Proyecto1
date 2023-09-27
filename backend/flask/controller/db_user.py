@@ -1,12 +1,30 @@
-import mysql.connector
+
+import mysql.connector 
 import os
 
-conn = mysql.connector.connect(
-    host='semi-p1.ct2boqzs8ewg.us-east-1.rds.amazonaws.com',  # Reemplaza con la dirección de tu servidor MySQL
-    user='admin',     # Reemplaza con tu nombre de usuario de MySQL
-    password='123456789',  # Reemplaza con tu contraseña de MySQL
-    database='db_semi1_p1'  # Reemplaza con el nombre de tu base de datos MySQL
-)
+db_config = {
+    'host': 'semi-p1.ct2boqzs8ewg.us-east-1.rds.amazonaws.com',
+    'user': 'admin',
+    'password': '123456789',
+    'database': 'db_semi1_p1',
+    'port': 3306
+}
+
+# Inicializa la variable global de conexión
+conn = None
+
+# Función para conectar a la base de datos
+def connect_to_database():
+    global conn
+    try:
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            print("Conexión a la base de datos establecida.")
+    except mysql.connector.Error as e:
+        print("Error al conectar a la base de datos:", e)
+
+# Llama a la función para establecer la conexión al iniciar la aplicación
+connect_to_database()
 
 prefijoBucket = os.environ.get('PREFIJO_BUCKET')
 
@@ -452,5 +470,3 @@ def reproducirAleatorio(id_usuario):
     finally:
         cursor.close()
 
-# Cierra la conexión a la base de datos
-conn.close()
