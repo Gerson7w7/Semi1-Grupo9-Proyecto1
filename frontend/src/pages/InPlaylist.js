@@ -7,6 +7,7 @@ const InPlaylist = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const nombrePlaylist = params.get("nombrePlaylist");
+  const [imagenPlaylist, setimagenPlaylist] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [songToDelete, setSongToDelete] = useState(null); // Almacena el ID de la canción a eliminar
   /*const [songs, setSongs] = useState([
@@ -65,6 +66,7 @@ const InPlaylist = () => {
         console.log("lamadafukingplaylist", data)
         // Actualiza el estado con los datos de las canciones obtenidas
         setSongs(data.songs);
+        setimagenPlaylist(data.imagen_playlist)
       })
       .catch((error) => {
         console.error("Error al obtener las canciones:", error);
@@ -234,7 +236,7 @@ const InPlaylist = () => {
       <div className="container">
         <div className="image-box">
           <img
-            src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
+            src={imagenPlaylist}
             alt=""
             width="1300"
             height="400"
@@ -312,7 +314,7 @@ const InPlaylist = () => {
                   <tr key={song.id}>
                     <th scope="row" className="align-middle">
                       <img
-                        src="https://i.ytimg.com/vi/ymvYySd_P2E/maxresdefault.jpg"
+                        src={song.imagen}
                         alt=""
                         width="100"
                         height="60"
