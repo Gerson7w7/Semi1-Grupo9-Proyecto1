@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
-from controller.mysql import loginUsuario, registrarUsuario, existeUsuario
-from controller.s3 import guardarImagen
 import hashlib
-# Importa las rutas de administrador desde admin.py
+from controller.db_user import loginUsuario, registrarUsuario, existeUsuario
+from controller.s3 import guardarImagen
+
 auth_routes = Blueprint('auth_routes', __name__)
 
 @auth_routes.route('/', methods=['GET'])

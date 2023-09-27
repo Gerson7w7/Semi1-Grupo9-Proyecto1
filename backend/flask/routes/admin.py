@@ -1,13 +1,12 @@
 from flask import Blueprint, request, jsonify
-from controller.mysql import (
-    getIdArtista, getNombreArtista, createArtista, readArtistas, updateArtista, deleteArtista,
-    getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion
+from controller.db_admin import (
+    getIdArtista, createArtista, readArtistas, updateArtista, deleteArtista,
+    getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion,
+    getIdAlbum, createAlbum, deleteAlbum, readCancionesAlbum, addCancionAlbum, deleteCancionAlbum
 )
 from controller.s3 import guardarImagen, guardarCancion
 
 admin_routes = Blueprint('admin_routes', __name__)
-
-
 
 @admin_routes.route('/crear-artista', methods=['POST'])
 def crear_artista():
@@ -51,7 +50,7 @@ def actualizar_artista():
 
         nombre = nombre if nombre else ''
         if imagen:
-            nombre_original = getNombreArtista(id)
+            nombre_original = getIdArtista(id)['nombre']
             guardarImagen('artistas/' + nombre_original, imagen)
         else:
             imagen = ''
@@ -158,3 +157,113 @@ def eliminar_cancion():
     except Exception as e:
         print(e)
         return jsonify({"ok": False}), 400
+
+@admin_routes.route('/crear-album', methods=['POST'])
+def crear_album():
+    try:
+        data = request.json
+        nombre = data.get('nombre')
+        descripcion = data.get('descripcion')
+        imagen = data.get('imagen')
+        artista = data.get('artista')
+
+        res_artista = getIdArtista(artista)
+        if res_artista['status']:
+            existente = getIdAlbum(nombre, res_artista['id_artista'])
+            if not existente['status']:
+                result = createAlbum(nombre, descripcion, res_artista['id_artista'])
+                if result['status']:
+                    guardarImagen('albumes/' + str(result['id_album']), imagen)
+                    return jsonify({"ok": True}), 200
+
+        return jsonify({"ok": False}), 400
+
+    except Exception as e:
+        print(e)
+        return jsonify({"ok": False}), 400
+
+@admin_routes.route('/delete-album', methods=['POST'])
+def eliminar_album():
+    try:
+        data = request.json
+        id_album = data.get('id')
+
+        result = deleteAlbum(id_album)
+        return jsonify(result), 200
+
+    except Exception as e:
+        print(e)
+        return jsonify({"ok": False}), 400
+
+@admin_routes.route('/album', methods=['POST'])
+def album():
+    try:
+        nombre = request.json
+        id_album = getIdAlbum(nombre)
+        if id_album['status']:
+            result = readCancionesAlbum(id_album['id_album'])
+            return jsonify({"songs": result['canciones']}), 200
+        return jsonify({"songs": []}), 400
+
+    except Exception as e:
+        print(e)
+        return jsonify({"ok": False}), 400
+
+@admin_routes.route('/album/<nombre>', methods=['GET'])
+def obtener_album(nombre):
+    try:
+        album = getIdAlbum(nombre)
+        if album['status']:
+            result = readCancionesAlbum(album['id_album'])
+            return jsonify({"songs": result['canciones']}), 200
+        return jsonify({"songs": []}), 200
+
+    except Exception as e:
+        print(e)
+        return jsonify({"songs": []}), 200
+
+@admin_routes.route('/add-song-album', methods=['POST'])
+def agregar_cancion_album():
+    try:
+        data = request.json
+        id_cancion = data.get('id_cancion')
+        nombre_album = data.get('nombre_album')
+        artista = data.get('artista')
+
+        res_artista = getIdArtista(artista)
+        if res_artista['status']:
+            album = getIdAlbum(nombre_album, res_artista['id_artista'])
+            if not album['status']:
+                result = addCancionAlbum(id_cancion, album['id_album'])
+                if result['status']:
+                    c = readCancionesAlbum(album['id_album'])
+                    return jsonify({"songs": c['canciones']}), 200
+
+        return jsonify({"songs": []}), 400
+
+    except Exception as e:
+        print(e)
+        return jsonify({"songs": []}), 400
+
+@admin_routes.route('/delete-song-album', methods=['POST'])
+def eliminar_cancion_album():
+    try:
+        data = request.json
+        id_cancion = data.get('id_cancion')
+        nombre_album = data.get('nombre_album')
+        artista = data.get('artista')
+
+        res_artista = getIdArtista(artista)
+        if res_artista['status']:
+            album = getIdAlbum(nombre_album, res_artista['id_artista'])
+            if not album['status']:
+                result = deleteCancionAlbum(id_cancion, album['id_album'])
+                if result['status']:
+                    c = readCancionesAlbum(album['id_album'])
+                    return jsonify({"songs": c['canciones']}), 200
+
+        return jsonify({"songs": []}), 400
+
+    except Exception as e:
+        print(e)
+        return jsonify({"songs": []}), 400
