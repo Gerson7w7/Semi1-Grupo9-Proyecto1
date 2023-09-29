@@ -19,8 +19,6 @@ conn = None
 
 # Función para establecer la conexión a la base de datos
 def conectar_a_bd():
-    
-    conectar_a_bd()
     global conn
     if conn is None:
         try:
@@ -35,8 +33,6 @@ conectar_a_bd()
 
 #======================================= LOGIN USUARIO ========================================
 def loginUsuario(correo, password):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT id_usuario FROM Usuarios WHERE correo = %s AND password = %s', (correo, password))
@@ -51,8 +47,6 @@ def loginUsuario(correo, password):
         cursor.close()
 
 def passwordCorrecto(id_usuario, password):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT password FROM Usuarios WHERE id_usuario = %s AND password = %s', (id_usuario, password))
@@ -67,8 +61,6 @@ def passwordCorrecto(id_usuario, password):
         cursor.close()
 
 def existeUsuario(correo):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT 1 FROM Usuarios WHERE correo = %s', (correo,))
@@ -80,8 +72,6 @@ def existeUsuario(correo):
         cursor.close()
 
 def registrarUsuario(nombres, apellidos, correo, password, fecha):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('INSERT INTO Usuarios (nombres, apellidos, correo, password, fecha_nacimiento) VALUES (%s, %s, %s, %s, %s)',
@@ -96,8 +86,6 @@ def registrarUsuario(nombres, apellidos, correo, password, fecha):
 
 #============================================= BUSCAR =============================================
 def buscarCanciones(id_usuario, palabra):
-    
-    conectar_a_bd()
     palabra = f"%{palabra}%"
     cursor = conn.cursor(dictionary=True)
     try:
@@ -124,8 +112,6 @@ def buscarCanciones(id_usuario, palabra):
         cursor.close()
 
 def buscarAlbumes(palabra):
-    
-    conectar_a_bd()
     palabra = f"%{palabra}%"
     cursor = conn.cursor(dictionary=True)
     try:
@@ -150,8 +136,6 @@ def buscarAlbumes(palabra):
         cursor.close()
 
 def buscarArtistas(palabra):
-    
-    conectar_a_bd()
     palabra = f"%{palabra}%"
     cursor = conn.cursor(dictionary=True)
     try:
@@ -174,8 +158,6 @@ def buscarArtistas(palabra):
 
 #============================================= PERFIL =============================================
 def getPerfil(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT id_usuario, nombres, apellidos, correo FROM Usuarios WHERE id_usuario = %s', (id_usuario,))
@@ -195,8 +177,6 @@ def getPerfil(id_usuario):
         cursor.close()
 
 def modificarPerfil(id_usuario, nombres, apellidos, correo):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute("""UPDATE Usuarios
@@ -217,8 +197,6 @@ def modificarPerfil(id_usuario, nombres, apellidos, correo):
 
 #=========================================== FAVORITOS ============================================
 def favorito(id_usuario, id_cancion):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT 1 FROM Favoritos WHERE id_usuario = %s AND id_cancion = %s', (id_usuario, id_cancion))
@@ -241,8 +219,6 @@ def favorito(id_usuario, id_cancion):
         cursor.close()
 
 def getFavoritos(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""SELECT c.id_cancion, c.nombre, c.duracion, art.nombre AS artista 
@@ -267,8 +243,6 @@ def getFavoritos(id_usuario):
 
 #========================================= CRUD PLAYLISTS ==========================================
 def getIdPlaylist(id_usuario, nombre):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT id_playlist FROM Playlists WHERE id_usuario = %s AND nombre = %s', (id_usuario, nombre))
@@ -283,8 +257,6 @@ def getIdPlaylist(id_usuario, nombre):
         cursor.close()
 
 def createPlaylist(id_usuario, nombre, descripcion, imagen):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         descripcion = descripcion if descripcion else ''
@@ -299,8 +271,6 @@ def createPlaylist(id_usuario, nombre, descripcion, imagen):
         cursor.close()
 
 def readPlaylists(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT id_playlist, nombre, descripcion FROM Playlists WHERE id_usuario = %s', (id_usuario,))
@@ -319,8 +289,6 @@ def readPlaylists(id_usuario):
 
 #========================================= CRUD PLAYLISTS ==========================================
 def addCancionPlaylist(id_cancion, id_playlist):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('INSERT INTO Playlist_canciones (id_playlist, id_cancion) VALUES (%s, %s)', (id_playlist, id_cancion))
@@ -334,8 +302,6 @@ def addCancionPlaylist(id_cancion, id_playlist):
         cursor.close()
 
 def deleteCancionPlaylist(id_cancion, id_playlist):
-    
-    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('DELETE FROM Playlist_canciones WHERE id_playlist = %s AND id_cancion = %s', (id_playlist, id_cancion))
@@ -349,8 +315,6 @@ def deleteCancionPlaylist(id_cancion, id_playlist):
         cursor.close()
 
 def readCancionesPlaylist(id_playlist):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista 
@@ -375,8 +339,6 @@ def readCancionesPlaylist(id_playlist):
 
 #============================================ HISTÓRICO ============================================
 def getTopCanciones(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""SELECT c.nombre, a.nombre AS artista, COUNT(*) AS veces 
@@ -395,8 +357,6 @@ def getTopCanciones(id_usuario):
         cursor.close()
 
 def getTopArtistas(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""SELECT a.nombre, COUNT(*) AS veces 
@@ -415,8 +375,6 @@ def getTopArtistas(id_usuario):
         cursor.close()
 
 def getTopAlbums(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""SELECT alb.nombre, a.nombre AS artista, COUNT(*) AS veces 
@@ -436,8 +394,6 @@ def getTopAlbums(id_usuario):
         cursor.close()
 
 def getHistorial(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute("""SELECT c.nombre, a.nombre AS artista, c.duracion 
@@ -455,8 +411,6 @@ def getHistorial(id_usuario):
 
 #========================================== REPRODUCCIÓN ==========================================
 def reproducirAlbum(id_usuario, id_album):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT id_cancion, nombre FROM Canciones c WHERE id_album = %s', (id_album,))
@@ -472,8 +426,6 @@ def reproducirAlbum(id_usuario, id_album):
         cursor.close()
 
 def reproducirArtista(id_usuario, id_artista):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT id_cancion, nombre FROM Canciones c WHERE id_artista = %s', (id_artista,))
@@ -489,8 +441,6 @@ def reproducirArtista(id_usuario, id_artista):
         cursor.close()
 
 def reproducirAleatorio(id_usuario):
-    
-    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT id_cancion, nombre FROM Canciones ORDER BY RAND()')
