@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 import hashlib
-from controller.db_admin import (
+from functions.db_admin import (
     readCanciones,
     readAlbumes,
     readArtistas,
@@ -29,11 +29,11 @@ from controller.db_user import (
     reproducirArtista,
     reproducirAleatorio,
 )
-from controller.s3 import guardarImagen
+from mis3.config_s3 import guardarImagen
 
-auth_routes = Blueprint("auth_routes", __name__)
+suscriptor_routes = Blueprint("suscriptor_routes", __name__)
 
-@auth_routes.route("/inicio", methods=["GET"])
+@suscriptor_routes.route("/inicio", methods=["GET"])
 def inicio():
     try:
         c = readCanciones()
@@ -45,7 +45,7 @@ def inicio():
         print(error)
         return jsonify({"canciones": [], "albums": [], "artistas": []})
 
-@auth_routes.route("/perfil", methods=["POST"])
+@suscriptor_routes.route("/perfil", methods=["POST"])
 def perfil():
     try:
         id_usuario = request.json.get("id_usuario")
@@ -55,7 +55,7 @@ def perfil():
         print(error)
         return jsonify({"imagen": "", "nombre": "", "apellido": "", "email": ""})
 
-@auth_routes.route("/modificar-perfil", methods=["POST"])
+@suscriptor_routes.route("/modificar-perfil", methods=["POST"])
 def modificar_perfil():
     try:
         data = request.json
@@ -78,7 +78,7 @@ def modificar_perfil():
         print(error)
         return jsonify({"ok": False}), 400
 
-@auth_routes.route("/buscar", methods=["POST"])
+@suscriptor_routes.route("/buscar", methods=["POST"])
 def buscar():
     try:
         data = request.json
@@ -93,7 +93,7 @@ def buscar():
         print(error)
         return jsonify({"ok": False}), 400
 
-@auth_routes.route("/favorito", methods=["POST"])
+@suscriptor_routes.route("/favorito", methods=["POST"])
 def marcar_favorito():
     try:
         data = request.json
@@ -105,7 +105,7 @@ def marcar_favorito():
         print(error)
         return jsonify({"ok": False}), 400
 
-@auth_routes.route("/favorites", methods=["POST"])
+@suscriptor_routes.route("/favorites", methods=["POST"])
 def obtener_favoritos():
     try:
         id_usuario = request.json.get("id_usuario")
@@ -115,7 +115,7 @@ def obtener_favoritos():
         print(error)
         return jsonify({"songs": []})
 
-@auth_routes.route("/playlist", methods=["POST"])
+@suscriptor_routes.route("/playlist", methods=["POST"])
 def crear_playlist():
     try:
         data = request.json
@@ -134,7 +134,7 @@ def crear_playlist():
         print(error)
         return jsonify({"ok": False, "playlist": []})
 
-@auth_routes.route("/playlists", methods=["POST"])
+@suscriptor_routes.route("/playlists", methods=["POST"])
 def obtener_playlists():
     try:
         id_usuario = request.json.get("id_usuario")
@@ -144,7 +144,7 @@ def obtener_playlists():
         print(error)
         return jsonify({"playlist": []})
 
-@auth_routes.route("/playlist/add-song", methods=["POST"])
+@suscriptor_routes.route("/playlist/add-song", methods=["POST"])
 def agregar_cancion_a_playlist():
     try:
         data = request.json
@@ -161,7 +161,7 @@ def agregar_cancion_a_playlist():
         print(error)
         return jsonify({"songs": []})
 
-@auth_routes.route("/playlist/delete-song", methods=["POST"])
+@suscriptor_routes.route("/playlist/delete-song", methods=["POST"])
 def eliminar_cancion_de_playlist():
     try:
         data = request.json
@@ -178,7 +178,7 @@ def eliminar_cancion_de_playlist():
         print(error)
         return jsonify({"songs": []})
 
-@auth_routes.route("/inplaylist", methods=["POST"])
+@suscriptor_routes.route("/inplaylist", methods=["POST"])
 def obtener_canciones_de_playlist():
     try:
         data = request.json
@@ -197,7 +197,7 @@ def obtener_canciones_de_playlist():
         print(error)
         return jsonify({"songs": [], "imagen_playlist": ""})
 
-@auth_routes.route("/historial", methods=["POST"])
+@suscriptor_routes.route("/historial", methods=["POST"])
 def obtener_historial():
     try:
         id_usuario = request.json.get("id_usuario")
@@ -221,7 +221,7 @@ def obtener_historial():
             "historial": []
         })
 
-@auth_routes.route("/reproducir", methods=["POST"])
+@suscriptor_routes.route("/reproducir", methods=["POST"])
 def reproducir():
     data = request.json
     id_usuario = data["id_usuario"]
@@ -244,7 +244,7 @@ def reproducir():
         print(error)
         return jsonify({"tracks": []})
 
-@auth_routes.route("/reproducir-aleatorio", methods=["POST"])
+@suscriptor_routes.route("/reproducir-aleatorio", methods=["POST"])
 def reproducir_aleatorio():
     try:
         id_usuario = request.json.get("id_usuario")

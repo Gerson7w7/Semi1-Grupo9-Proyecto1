@@ -15,6 +15,8 @@ conn = None
 
 # Función para establecer la conexión a la base de datos
 def conectar_a_bd():
+    
+    conectar_a_bd()
     global conn
     if conn is None:
         try:
@@ -27,10 +29,12 @@ def conectar_a_bd():
 # Ejecutar la función para establecer la conexión una vez
 conectar_a_bd()
 
-prefijoBucket = os.environ.get('https://multimedia-semi1-g9.s3.amazonaws.com/')
+prefijoBucket = "https://multimedia-semi1-g9.s3.amazonaws.com/"
 
 #========================================== CRUD ARTISTAS ==========================================
 def getIdArtista(nombre):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT id_artista FROM Artistas WHERE nombre = %s', (nombre,))
@@ -45,6 +49,8 @@ def getIdArtista(nombre):
         cursor.close()
 
 def createArtista(nombre, fecha_nacimiento=None):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         if fecha_nacimiento:
@@ -60,6 +66,8 @@ def createArtista(nombre, fecha_nacimiento=None):
         cursor.close()
 
 def readArtistas():
+    
+    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT * FROM Artistas')
@@ -82,6 +90,8 @@ def readArtistas():
         cursor.close()
 
 def readCancionesArtista(id_artista):
+    
+    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista FROM Canciones c INNER JOIN Artistas a ON a.id_artista = c.id_artista WHERE c.id_artista = %s', (id_artista,))
@@ -101,6 +111,8 @@ def readCancionesArtista(id_artista):
         cursor.close()
 
 def getNombreArtista(id):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT nombre FROM Artistas WHERE id_artista = %s', (id,))
@@ -115,6 +127,8 @@ def getNombreArtista(id):
         cursor.close()
 
 def updateArtista(id_artista, nombre=None, fecha=None):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         params = []
@@ -145,6 +159,8 @@ def updateArtista(id_artista, nombre=None, fecha=None):
         cursor.close()
 
 def deleteArtista(id):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('DELETE FROM Artistas WHERE id_artista = %s', (id,))
@@ -162,6 +178,8 @@ def deleteArtista(id):
 
 #========================================= CRUD CANCIONES ==========================================
 def getIdCancion(nombre, id_artista):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT id_cancion FROM Canciones WHERE nombre = %s AND id_artista = %s', (nombre, id_artista))
@@ -179,6 +197,8 @@ def getIdCancion(nombre, id_artista):
 
 #========================================= CRUD CANCIONES ==========================================
 def getIdArtistaCancion(id_cancion):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT id_artista FROM Canciones WHERE id_cancion = %s', (id_cancion,))
@@ -193,6 +213,8 @@ def getIdArtistaCancion(id_cancion):
         cursor.close()
 
 def createCancion(nombre, duracion, id_artista):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('INSERT INTO Canciones (nombre, duracion, id_artista) VALUES (%s, %s, %s)', (nombre, duracion, id_artista))
@@ -205,6 +227,8 @@ def createCancion(nombre, duracion, id_artista):
         cursor.close()
 
 def readCanciones():
+    
+    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista FROM Canciones c INNER JOIN Artistas a ON a.id_artista = c.id_artista')
@@ -224,6 +248,8 @@ def readCanciones():
         cursor.close()
 
 def updateCancion(id_cancion, nombre=None, duracion=None, id_artista=None):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         params = []
@@ -257,6 +283,8 @@ def updateCancion(id_cancion, nombre=None, duracion=None, id_artista=None):
         cursor.close()
 
 def deleteCancion(id):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('DELETE FROM Canciones WHERE id_cancion = %s', (id,))
@@ -274,6 +302,8 @@ def deleteCancion(id):
 
 #========================================== CRUD ALBUMES ==========================================
 def getIdAlbum(nombre, id_artista):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('SELECT id_album FROM Albumes WHERE nombre = %s AND id_artista = %s', (nombre, id_artista))
@@ -288,6 +318,8 @@ def getIdAlbum(nombre, id_artista):
         cursor.close()
 
 def createAlbum(nombre, descripcion, id_artista):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('INSERT INTO Albumes (nombre, descripcion, id_artista) VALUES (%s, %s, %s)', (nombre, descripcion, id_artista))
@@ -300,6 +332,8 @@ def createAlbum(nombre, descripcion, id_artista):
         cursor.close()
 
 def readAlbumes():
+    
+    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT alb.id_album, alb.nombre, alb.descripcion, a.nombre AS artista FROM Albumes alb INNER JOIN Artistas a ON a.id_artista = alb.id_artista')
@@ -319,6 +353,8 @@ def readAlbumes():
         cursor.close()
 
 def updateAlbum(id_album, nombre=None, descripcion=None):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         params = []
@@ -349,6 +385,8 @@ def updateAlbum(id_album, nombre=None, descripcion=None):
         cursor.close()
 
 def readCancionesAlbum(id_album):
+    
+    conectar_a_bd()
     cursor = conn.cursor(dictionary=True)
     try:
         cursor.execute('SELECT c.id_cancion, c.nombre, c.duracion, a.nombre AS artista FROM Canciones c INNER JOIN Artistas a ON a.id_artista = c.id_artista WHERE c.id_album = %s', (id_album,))
@@ -368,6 +406,8 @@ def readCancionesAlbum(id_album):
         cursor.close()
 
 def addCancionAlbum(id_cancion, id_album):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('UPDATE Canciones SET id_album = %s WHERE id_cancion = %s', (id_album, id_cancion))
@@ -384,6 +424,8 @@ def addCancionAlbum(id_cancion, id_album):
         cursor.close()
 
 def deleteCancionAlbum(id_cancion, id_album):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('UPDATE Canciones SET id_album = NULL WHERE id_cancion = %s AND id_album = %s', (id_cancion, id_album))
@@ -400,6 +442,8 @@ def deleteCancionAlbum(id_cancion, id_album):
         cursor.close()
 
 def deleteAlbum(id_album):
+    
+    conectar_a_bd()
     cursor = conn.cursor()
     try:
         cursor.execute('DELETE FROM Albumes WHERE id_album = %s', (id_album,))

@@ -1,13 +1,10 @@
 from flask import Blueprint, request, jsonify
 import hashlib
 from controller.db_user import loginUsuario, registrarUsuario, existeUsuario
-from controller.s3 import guardarImagen
+from mis3.config_s3 import guardarImagen
 
 auth_routes = Blueprint('auth_routes', __name__)
 
-@auth_routes.route('/', methods=['GET'])
-def api_status():
-    return jsonify({"message": "API corriendo"})
 
 @auth_routes.route('/login', methods=['POST'])
 def login():

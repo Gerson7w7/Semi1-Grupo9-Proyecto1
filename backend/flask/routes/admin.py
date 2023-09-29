@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify
-from db_admin import (getIdArtista, createArtista, readArtistas, updateArtista, deleteArtista,
+from functions.db_admin import (getIdArtista, createArtista, readArtistas, updateArtista, deleteArtista,
                      getIdCancion, createCancion, readCanciones, updateCancion, deleteCancion,
                      getIdAlbum, createAlbum, updateAlbum, deleteAlbum, readCancionesAlbum,
                      addCancionAlbum, deleteCancionAlbum, readAlbumes)
-from s3 import guardarImagen, guardarCancion
+from mis3.config_s3 import guardarImagen, guardarCancion
 
-prefijoBucket = process.env.PREFIJO_BUCKET
+prefijoBucket = "https://multimedia-semi1-g9.s3.amazonaws.com/"
 
 admin_routes = Blueprint('admin_routes', __name__)
 
