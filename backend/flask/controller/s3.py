@@ -1,10 +1,10 @@
 import boto3
 import base64
 
-bucket = 'semi1-ht-p1-202004707'
+bucket = 'multimedia-semi1-g9'
 region='us-east-1'  # Reemplaza 'tu_region' con la región de AWS apropiada
-access_key_id = 'tu_access_key_id'  # Reemplaza 'tu_access_key_id' con tus credenciales de AWS
-secret_access_key = 'tu_secret_access_key'  # Reemplaza 'tu_secret_access_key' con tus credenciales de AWS
+access_key_id = 'AKIAULIXOKZQ7I5ISCEC'  # Reemplaza 'tu_access_key_id' con tus credenciales de AWS
+secret_access_key = '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'  # Reemplaza 'tu_secret_access_key' con tus credenciales de AWS
 
 # Configura las credenciales de AWS
 s3 = boto3.client(

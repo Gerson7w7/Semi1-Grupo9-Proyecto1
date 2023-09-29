@@ -1,31 +1,33 @@
-import mysql.connector 
+import mysql.connector
 import os
-# Configura la información de conexión a la base de datos
+
+# Variables de configuración de la base de datos
 db_config = {
     'host': 'semi-p1.ct2boqzs8ewg.us-east-1.rds.amazonaws.com',
     'user': 'admin',
     'password': '123456789',
     'database': 'db_semi1_p1',
-    'port': 3306
+    'port': 3306,
 }
 
-# Inicializa la variable global de conexión
+# Variable global para almacenar la conexión
 conn = None
 
-# Función para conectar a la base de datos
-def connect_to_database():
+# Función para establecer la conexión a la base de datos
+def conectar_a_bd():
     global conn
-    try:
-        conn = mysql.connector.connect(**db_config)
-        if conn.is_connected():
+    if conn is None:
+        try:
+            conn = mysql.connector.connect(**db_config)
             print("Conexión a la base de datos establecida.")
-    except mysql.connector.Error as e:
-        print("Error al conectar a la base de datos:", e)
+        except mysql.connector.Error as err:
+            print(f"Error al conectar a la base de datos: {err}")
+    return conn
 
-# Llama a la función para establecer la conexión al iniciar la aplicación
-connect_to_database()
+# Ejecutar la función para establecer la conexión una vez
+conectar_a_bd()
 
-prefijoBucket = os.environ.get('PREFIJO_BUCKET')
+prefijoBucket = os.environ.get('https://multimedia-semi1-g9.s3.amazonaws.com/')
 
 #========================================== CRUD ARTISTAS ==========================================
 def getIdArtista(nombre):
@@ -74,20 +76,6 @@ def readArtistas():
             except Exception as e:
                 print(e)
         return {'artistas': artistas}
-    except Exception as e:
-        raise e
-    finally:
-        cursor.close()
-
-def getIdArtistaCancion(id_cancion):
-    cursor = conn.cursor(dictionary=True)
-    try:
-        cursor.execute('SELECT id_artista FROM Canciones WHERE id_cancion = %s', (id_cancion,))
-        result = cursor.fetchone()
-        if result:
-            return {'status': True, 'id_artista': result['id_artista']}
-        else:
-            return {'status': False}
     except Exception as e:
         raise e
     finally:
@@ -187,6 +175,23 @@ def getIdCancion(nombre, id_artista):
     finally:
         cursor.close()
 
+# ... (Las funciones CRUD de artistas que se proporcionaron anteriormente)
+
+#========================================= CRUD CANCIONES ==========================================
+def getIdArtistaCancion(id_cancion):
+    cursor = conn.cursor()
+    try:
+        cursor.execute('SELECT id_artista FROM Canciones WHERE id_cancion = %s', (id_cancion,))
+        result = cursor.fetchone()
+        if result:
+            return {'status': True, 'id_artista': result[0]}
+        else:
+            return {'status': False}
+    except Exception as e:
+        raise e
+    finally:
+        cursor.close()
+
 def createCancion(nombre, duracion, id_artista):
     cursor = conn.cursor()
     try:
@@ -227,15 +232,15 @@ def updateCancion(id_cancion, nombre=None, duracion=None, id_artista=None):
         if nombre:
             actualizacion += 'nombre = %s, '
             params.extend([nombre, nombre])
-        if duracion:
+        if duracion is not None:
             actualizacion += 'duracion = %s, '
             params.extend([duracion, duracion])
-        if id_artista:
+        if id_artista is not None:
             actualizacion += 'id_artista = %s, '
             params.extend([id_artista, id_artista])
 
         if actualizacion.endswith(', '):
-            actualizacion = actualizacion[:-2]  # Eliminar la última coma y espacio
+            actualizacion = actualización[:-2]  # Eliminar la última coma y espacio
 
         params.append(id_cancion)
         cursor.execute(f'UPDATE Canciones {actualizacion} WHERE id_cancion = %s', params)
@@ -313,6 +318,36 @@ def readAlbumes():
     finally:
         cursor.close()
 
+def updateAlbum(id_album, nombre=None, descripcion=None):
+    cursor = conn.cursor()
+    try:
+        params = []
+        actualizacion = 'SET '
+
+        if nombre:
+            actualizacion += 'nombre = %s, '
+            params.extend([nombre, nombre])
+        if descripcion:
+            actualizacion += 'descripcion = %s, '
+            params.extend([descripcion, descripcion])
+
+        if actualizacion.endswith(', '):
+            actualizacion = actualizacion[:-2]  # Eliminar la última coma y espacio
+
+        params.append(id_album)
+        cursor.execute(f'UPDATE Albumes {actualizacion} WHERE id_album = %s', params)
+        conn.commit()
+
+        if cursor.rowcount > 0:
+            return {'ok': True}
+        else:
+            return {'ok': False}
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        cursor.close()
+
 def readCancionesAlbum(id_album):
     cursor = conn.cursor(dictionary=True)
     try:
@@ -379,3 +414,4 @@ def deleteAlbum(id_album):
         raise e
     finally:
         cursor.close()
+
